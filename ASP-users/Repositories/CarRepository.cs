@@ -166,6 +166,60 @@ namespace ASP_users.Repositories
             return usersCars;
         }
 
+        public async Task<IEnumerable<Car>> SearchCars(string searchQuery)
+        {
+            var searchedCars = new List<Car>();
+
+            var command = CreateCommand(
+                @"SELECT 
+                    CarID,
+                    UserID,
+                    Firm,
+                    Model, 
+                    Color,
+                    Year,
+                    LicensePlate,
+                    CarPhotoURL
+                FROM
+                    Cars
+                WHERE
+                    Firm LIKE @searchQuery OR LicensePlate LIKE @searchQuery"
+            );
+
+            command.Parameters.AddWithValue("@searchQuery", $"%{searchQuery}%");
+
+            _connection.Open();
+
+            var reader = await command.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
+            {
+                var carID = reader.GetInt32(0);
+
+                var car = searchedCars.FirstOrDefault(x => x.CarID == carID);
+
+                if (car == null)
+                {
+                    car = new Car
+                    {
+                        CarID = carID,
+                        UserID = reader.GetGuid(1),
+                        Firm = reader.GetString(2),
+                        Model = reader.GetString(3),
+                        Color = reader.GetString(4),
+                        Year = reader.GetInt32(5),
+                        LicensePlate = reader.GetString(6),
+                        CarPhotoURL = reader.IsDBNull(7) ? null : reader.GetString(7)
+                    };
+                    searchedCars.Add(car);
+                }
+            } 
+            
+            _connection.Close();
+
+            return searchedCars;
+        }
+
         public async Task UpdateCar(int carId, Car car)
         {
             var command = CreateCommand(

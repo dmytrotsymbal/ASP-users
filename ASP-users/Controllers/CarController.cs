@@ -48,6 +48,17 @@ namespace ASP_users.Controllers
         }
 
 
+        [HttpGet("SearchCars")]
+        public async Task<IActionResult> SearchCars(string searchQuery)
+        {
+            var cars = await _carRepository.SearchCars(searchQuery);
+            if (cars == null)
+            {
+                return NotFound();
+            }
+            return Ok(cars);
+        }
+
 
         [HttpPut("UpdateCar/{CarId}")]
         public async Task<IActionResult> UpdateCar(int carId, Car car)
