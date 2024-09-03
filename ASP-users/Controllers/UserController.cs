@@ -128,7 +128,7 @@ namespace ASP_users.Controllers
         [HttpGet("quantity")]
         public async Task<IActionResult> GetUsersCount()
         {
-            var usersCount = await _userRepository.GetUsersCount();
+            int usersCount = await _userRepository.GetUsersCount();
             return Ok(usersCount);
         }
     }

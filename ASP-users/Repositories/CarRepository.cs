@@ -8,8 +8,10 @@ namespace ASP_users.Repositories
     {
         public CarRepository(MySqlConnection connection) : base(connection) { }
 
-        public async Task<IEnumerable<Car>> GetAllCars()
+        public async Task<IEnumerable<Car>> GetAllCars(int pageNumber, int pageSize)
         {
+            var offset = (pageNumber - 1) * pageSize;
+
             var carsList = new List<Car>();
 
             var command = CreateCommand(
@@ -23,8 +25,12 @@ namespace ASP_users.Repositories
 	                LicensePlate,
 	                CarPhotoURL
                 FROM 
-                    Cars"
+                    Cars
+                LIMIT @offset, @pageSize"
             );
+
+            command.Parameters.AddWithValue("@offset", offset);
+            command.Parameters.AddWithValue("@pageSize", pageSize);
 
             _connection.Open();
 
@@ -34,11 +40,11 @@ namespace ASP_users.Repositories
             {
                 var carId = reader.GetInt32(0);
 
-                var car = carsList.FirstOrDefault(x => x.CarID == carId);
+                var car = carsList.FirstOrDefault(x => x.CarID == carId); // Перевіряємо чи машину вже знайдено
 
-                if (car == null) // Якщо користувача не знайдено
+                if (car == null) // Якщо машини не знайдено
                 {
-                    car = new Car // Створюємо нового користувача
+                    car = new Car // Створюємо нову машину
                     {
                         CarID = carId,
                         UserID = reader.GetGuid(1),
@@ -49,7 +55,7 @@ namespace ASP_users.Repositories
                         LicensePlate = reader.GetString(6),
                         CarPhotoURL = reader.IsDBNull(7) ? null : reader.GetString(7)
                     };
-                    carsList.Add(car);
+                    carsList.Add(car); // Додаємо машину до списку
                 }
             }
 
@@ -229,6 +235,26 @@ namespace ASP_users.Repositories
             await command.ExecuteNonQueryAsync();
 
             _connection.Close();
+        }
+
+
+        // HALPERS
+        public async Task<int> GetCarsCount()
+        {
+            var command = CreateCommand(
+                @"SELECT 
+                    COUNT(*) 
+                FROM 
+                    Cars"
+            );
+
+            _connection.Open();
+
+            var carsCount = (int)(long)await command.ExecuteScalarAsync();
+
+            _connection.Close();
+
+            return carsCount;
         }
     }
 }

@@ -4,7 +4,7 @@ namespace ASP_users.Interfaces
 {
     public interface ICarRepository
     {
-        Task<IEnumerable<Car>> GetAllCars();
+        Task<IEnumerable<Car>> GetAllCars(int pageNumber, int pageSize);
 
         Task<Car> GetCarById(int carId);
 
@@ -15,5 +15,10 @@ namespace ASP_users.Interfaces
         Task AddCarToUser(Guid userId, Car car);
 
         Task DeleteCar(int CarId);
+
+
+        // HALPERS
+
+        Task<int> GetCarsCount();
     }
 }

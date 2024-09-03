@@ -1,6 +1,5 @@
 ﻿using ASP_users.Interfaces;
 using ASP_users.Models;
-using Microsoft.AspNetCore.Http.HttpResults;
 using MySqlConnector;
 
 namespace ASP_users.Repositories

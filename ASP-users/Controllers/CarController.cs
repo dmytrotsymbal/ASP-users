@@ -17,9 +17,9 @@ namespace ASP_users.Controllers
 
 
         [HttpGet("GetAllCars")]
-        public async Task<IActionResult> GetAllCars()
+        public async Task<IActionResult> GetAllCars(int pageNumber, int pageSize)
         {
-            var cars = await _carRepository.GetAllCars();
+            var cars = await _carRepository.GetAllCars(pageNumber, pageSize);
             return Ok(cars);
         }
 
@@ -80,6 +80,16 @@ namespace ASP_users.Controllers
         {
             await _carRepository.DeleteCar(CarId);
             return NoContent();
+        }
+
+
+        // HALPERS
+
+        [HttpGet("quantity")]
+        public async Task<IActionResult> GetCarsCount()
+        {
+            int carsCount = await _carRepository.GetCarsCount();
+            return Ok(carsCount);
         }
     }
 }
