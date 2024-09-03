@@ -20,7 +20,6 @@ namespace ASP_users.Interfaces
 
 
         // HALPERS
-
         Task<int> GetCarsCount();
     }
 }
