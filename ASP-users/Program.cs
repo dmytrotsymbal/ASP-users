@@ -14,8 +14,10 @@ builder.Services.AddScoped<MySqlConnection>(_ => new MySqlConnection(builder.Con
 // Реєстрація репозиторій та їхніх інтерфейсів в сервіс-контейнері
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IPhotoRepository, PhotoRepository>();
+builder.Services.AddScoped<IPhoneRepository, PhoneRepository>();
 builder.Services.AddScoped<ICarRepository, CarRepository>();
 builder.Services.AddScoped<IAddressRepository, AddressRepository>();
+
 
 var app = builder.Build();
 
