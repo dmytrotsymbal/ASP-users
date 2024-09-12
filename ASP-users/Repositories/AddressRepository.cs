@@ -2,7 +2,6 @@
 using ASP_users.Models;
 using MySqlConnector;
 
-
 namespace ASP_users.Repositories
 {
     public class AddressRepository : BaseRepository, IAddressRepository
@@ -18,10 +17,14 @@ namespace ASP_users.Repositories
                     AddressID,
                     UserID,
                     StreetAddress,
+                    HouseNumber,
+                    ApartmentNumber,
                     City,
                     State,
                     PostalCode,
-                    Country
+                    Country,
+                    Latitude,
+                    Longitude
                 FROM 
                     Addresses
                 WHERE 
@@ -44,10 +47,14 @@ namespace ASP_users.Repositories
                         AddressID = addressId,
                         UserID = userId,
                         StreetAddress = reader.GetString(2),
-                        City = reader.GetString(3),
-                        State = reader.GetString(4),
-                        PostalCode = reader.GetString(5),
-                        Country = reader.GetString(6),
+                        HouseNumber = reader.GetInt32(3),
+                        ApartmentNumber = reader.GetInt32(4),
+                        City = reader.GetString(5),
+                        State = reader.GetString(6),
+                        PostalCode = reader.GetString(7),
+                        Country = reader.GetString(8),
+                        Latitude = reader.GetDecimal(9),
+                        Longitude = reader.GetDecimal(10),
                     };
                     usersAddresses.Add(address);
                 }
@@ -66,10 +73,14 @@ namespace ASP_users.Repositories
                     AddressID,
                     UserID,
                     StreetAddress,
+                    HouseNumber,
+                    ApartmentNumber,
                     City,
                     State,
                     PostalCode,
-                    Country
+                    Country,
+                    Latitude,
+                    Longitude
                 FROM 
                     Addresses
                 WHERE 
@@ -88,10 +99,14 @@ namespace ASP_users.Repositories
                     AddressID = reader.GetInt32(0),
                     UserID = reader.GetGuid(1),
                     StreetAddress = reader.GetString(2),
-                    City = reader.GetString(3),
-                    State = reader.GetString(4),
-                    PostalCode = reader.GetString(5),
-                    Country = reader.GetString(6),
+                    HouseNumber = reader.GetInt32(3),
+                    ApartmentNumber = reader.GetInt32(4),
+                    City = reader.GetString(5),
+                    State = reader.GetString(6),
+                    PostalCode = reader.GetString(7),
+                    Country = reader.GetString(8),
+                    Latitude = reader.GetDecimal(9),
+                    Longitude = reader.GetDecimal(10),
                 };
             }
             _connection.Close();
@@ -107,19 +122,27 @@ namespace ASP_users.Repositories
                     Addresses
                 SET
                     StreetAddress = @StreetAddress,
+                    HouseNumber = @HouseNumber,
+                    ApartmentNumber = @ApartmentNumber,
                     City = @City,
                     State = @State,
                     PostalCode = @PostalCode,
-                    Country = @Country
+                    Country = @Country,
+                    Latitude = @Latitude,
+                    Longitude = @Longitude
                 WHERE
                     AddressID = @AddressID"
             );
             command.Parameters.AddWithValue("@AddressID", addressId);
             command.Parameters.AddWithValue("@StreetAddress", address.StreetAddress);
+            command.Parameters.AddWithValue("@HouseNumber", address.HouseNumber);
+            command.Parameters.AddWithValue("@ApartmentNumber", address.ApartmentNumber);
             command.Parameters.AddWithValue("@City", address.City);
             command.Parameters.AddWithValue("@State", address.State);
             command.Parameters.AddWithValue("@PostalCode", address.PostalCode);
             command.Parameters.AddWithValue("@Country", address.Country);
+            command.Parameters.AddWithValue("@Latitude", address.Latitude);
+            command.Parameters.AddWithValue("@Longitude", address.Longitude);
 
             _connection.Open();
 
@@ -133,16 +156,20 @@ namespace ASP_users.Repositories
         {
             var command = CreateCommand(
                 @"INSERT INTO Addresses 
-                    (UserID, StreetAddress, City, State, PostalCode, Country) 
+                    (UserID, StreetAddress, HouseNumber, ApartmentNumber, City, State, PostalCode, Country, Latitude, Longitude)
                 VALUES 
-                    (@UserID, @StreetAddress, @City, @State, @PostalCode, @Country)"
+                    (@UserID, @StreetAddress, @HouseNumber, @ApartmentNumber, @City, @State, @PostalCode, @Country, @Latitude, @Longitude)"
             );
             command.Parameters.AddWithValue("@UserID", userId);
             command.Parameters.AddWithValue("@StreetAddress", address.StreetAddress);
+            command.Parameters.AddWithValue("@HouseNumber", address.HouseNumber);
+            command.Parameters.AddWithValue("@ApartmentNumber", address.ApartmentNumber);
             command.Parameters.AddWithValue("@City", address.City);
             command.Parameters.AddWithValue("@State", address.State);
             command.Parameters.AddWithValue("@PostalCode", address.PostalCode);
             command.Parameters.AddWithValue("@Country", address.Country);
+            command.Parameters.AddWithValue("@Latitude", address.Latitude);
+            command.Parameters.AddWithValue("@Longitude", address.Longitude);
 
             _connection.Open();
 
