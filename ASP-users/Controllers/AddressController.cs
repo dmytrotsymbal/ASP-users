@@ -1,5 +1,6 @@
 ﻿using ASP_users.Interfaces;
 using ASP_users.Models;
+using ASP_users.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ASP_users.Controllers
@@ -8,18 +9,21 @@ namespace ASP_users.Controllers
     [ApiController]
     public class AddressController : ControllerBase
     {
-        private readonly IAddressRepository _addressRepository;
+        private readonly IUserAddressRepository _userAddressRepository;
 
-        public AddressController(IAddressRepository addressRepository)
+        public AddressController(IUserAddressRepository userAddressRepository)
         {
-            _addressRepository = addressRepository;
+            _userAddressRepository = userAddressRepository;
         }
 
 
+
+
+
         [HttpGet("GetAllUsersAddresses/{userId}")]
-        public async Task<IActionResult> GetAllUsersAddresses(Guid userId)
+        public async Task<IActionResult> GetUserAddresses(Guid userId)
         {
-            var usersAddresses = await _addressRepository.GetAllUsersAddresses(userId);
+            var usersAddresses = await _userAddressRepository.GetUserAddresses(userId);
             if (usersAddresses == null)
             {
                 return NotFound();
@@ -28,51 +32,51 @@ namespace ASP_users.Controllers
         }
 
 
-        
-        
-        [HttpGet("GetUserAddressById/{addressId}")]
-        public async Task<IActionResult> GetUserAddressById(int addressId)
-        {
-            var address = await _addressRepository.GetUserAddressById(addressId);
-            if (address == null)
-            {
-                return NotFound();
-            }
-            return Ok(address);
-        }
+
+
+        //[HttpGet("GetUserAddressById/{addressId}")]
+        //public async Task<IActionResult> GetUserAddressById(int addressId)
+        //{
+        //    var address = await _addressRepository.GetUserAddressById(addressId);
+        //    if (address == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    return Ok(address);
+        //}
 
 
 
         
-        [HttpPut("UpdateAddress/{addressId}")]
-        public async Task<IActionResult> UpdateAddress(int addressId, Address address)
-        {
-            if (address.AddressID != addressId)
-            {
-                return BadRequest("User ID mismatch");
-            }
-            await _addressRepository.UpdateAddress(addressId, address);
-            return NoContent();
-        }
+        //[HttpPut("UpdateAddress/{addressId}")]
+        //public async Task<IActionResult> UpdateAddress(int addressId, Address address)
+        //{
+        //    if (address.AddressID != addressId)
+        //    {
+        //        return BadRequest("User ID mismatch");
+        //    }
+        //    await _addressRepository.UpdateAddress(addressId, address);
+        //    return NoContent();
+        //}
 
 
 
 
-        [HttpPost("AddAddressToUser/{userId}")]
-        public async Task<IActionResult> AddAddressToUser(Guid userId, Address address)
-        {
-            await _addressRepository.AddAddressToUser(userId, address);
-            return CreatedAtAction("GetUserAddressById", new { addressId = address.AddressID }, address);
-        }
+        //[HttpPost("AddAddressToUser/{userId}")]
+        //public async Task<IActionResult> AddAddressToUser(Guid userId, Address address)
+        //{
+        //    await _addressRepository.AddAddressToUser(userId, address);
+        //    return CreatedAtAction("GetUserAddressById", new { addressId = address.AddressID }, address);
+        //}
 
 
 
 
-        [HttpDelete("DeleteAddress/{addressId}")]
-        public async Task<IActionResult> DeleteAddress(int addressId)
-        {
-            await _addressRepository.DeleteAddress(addressId);
-            return NoContent();
-        }
+        //[HttpDelete("DeleteAddress/{addressId}")]
+        //public async Task<IActionResult> DeleteAddress(int addressId)
+        //{
+        //    await _addressRepository.DeleteAddress(addressId);
+        //    return NoContent();
+        //}
     }
 }

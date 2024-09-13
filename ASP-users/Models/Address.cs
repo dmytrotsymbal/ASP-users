@@ -4,8 +4,6 @@
     {
         public int AddressID { get; set; }
 
-        public Guid UserID { get; set; }
-
         public string StreetAddress { get; set; }
 
         public int HouseNumber { get; set; }
