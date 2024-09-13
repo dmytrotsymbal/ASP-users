@@ -8,28 +8,28 @@ namespace ASP_users.Repositories
     {
         public UserAddressRepository(MySqlConnection connection) : base(connection) { }
 
-        public async Task<IEnumerable<UserAddressDetails>> GetUserAddresses(Guid userId)
+        public async Task<IEnumerable<DetailedUserAddress>> GetUserAddresses(Guid userId)
         {
-            var userAddressDetails = new List<UserAddressDetails>();
+            var userAddressDetails = new List<DetailedUserAddress>();
 
             var command = CreateCommand(
                 @"SELECT addresses.AddressID,
-                 useraddresses.UserID,
-                 addresses.StreetAddress,
-                 addresses.HouseNumber,  -- Здесь добавил HouseNumber
-                 addresses.ApartmentNumber,
-                 addresses.City,
-                 addresses.State,
-                 addresses.PostalCode,
-                 addresses.Country,
-                 addresses.Latitude,
-                 addresses.Longitude,
-                 useraddresses.MoveInDate,
-                 useraddresses.MoveOutDate
-         FROM 
-	             Addresses addresses INNER JOIN UserAddresses useraddresses ON addresses.AddressID = useraddresses.AddressID
-         WHERE 
-             useraddresses.UserID = @UserID");
+                         useraddresses.UserID,
+                         addresses.StreetAddress,
+                         addresses.HouseNumber,
+                         addresses.ApartmentNumber,
+                         addresses.City,
+                         addresses.State,
+                         addresses.PostalCode,
+                         addresses.Country,
+                         addresses.Latitude,
+                         addresses.Longitude,
+                         useraddresses.MoveInDate,
+                         useraddresses.MoveOutDate
+                 FROM 
+	                     Addresses addresses INNER JOIN UserAddresses useraddresses ON addresses.AddressID = useraddresses.AddressID
+                 WHERE 
+                         useraddresses.UserID = @UserID");
 
             command.Parameters.AddWithValue("@UserID", userId);
 
@@ -39,7 +39,7 @@ namespace ASP_users.Repositories
 
             while (await reader.ReadAsync())
             {
-                userAddressDetails.Add(new UserAddressDetails
+                userAddressDetails.Add(new DetailedUserAddress
                 {
                     AddressID = reader.GetInt32(0),
                     UserID = reader.GetGuid(1),

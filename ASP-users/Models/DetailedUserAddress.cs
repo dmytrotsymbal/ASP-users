@@ -1,6 +1,6 @@
 ﻿namespace ASP_users.Models
 {
-    public class UserAddressDetails
+    public class DetailedUserAddress
     {
         public int AddressID { get; set; }
         public Guid UserID { get; set; }
