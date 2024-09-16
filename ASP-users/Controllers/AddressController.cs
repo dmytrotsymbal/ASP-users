@@ -56,5 +56,24 @@ namespace ASP_users.Controllers
             }
         }
 
+
+
+        [HttpGet("get-living-history/{addressId}")]
+
+        public async Task<IActionResult> GetAddressLivingHistory(int addressId)
+        {
+            try
+            {
+                var addressLivingHistory = await _userAddressRepository.GetAddressLivingHistory(addressId);
+                if (addressLivingHistory == null)
+                {
+                    return NotFound();
+                }
+                return Ok(addressLivingHistory);
+            } 
+            catch (Exception ex) {
+                return BadRequest(ex);
+            }
+        }
     }
 }

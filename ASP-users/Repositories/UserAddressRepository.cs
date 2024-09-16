@@ -1,5 +1,6 @@
 ﻿using ASP_users.Interfaces;
 using ASP_users.Models;
+using ASP_users.Models.Helpers;
 using MySqlConnector;
 
 namespace ASP_users.Repositories
@@ -118,6 +119,52 @@ namespace ASP_users.Repositories
             _connection.Close();
 
             return detailedAddress;
+        }
+
+
+
+        public async Task<IEnumerable<Resident>> GetAddressLivingHistory(int addressId)
+        {
+            var addressLivingHistory = new List<Resident>();
+
+            var command = CreateCommand(
+                @"SELECT 
+	                u.UserID, 
+	                u.FirstName, 
+	                u.LastName, 
+	                u.Email,
+	                ua.MoveInDate,
+	                ua.MoveOutDate
+                FROM 
+	                users u JOIN UserAddresses ua ON u.UserID = ua.UserID
+	                JOIN Addresses a ON ua.AddressID = a.AddressID
+                WHERE 
+	                a.AddressID = @AddressID
+                ORDER BY 
+	                ua.MoveInDate DESC;");
+
+            command.Parameters.AddWithValue("@AddressID", addressId);
+
+            _connection.Open();
+
+            var reader = await command.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
+            {
+                addressLivingHistory.Add(new Resident
+                {
+                    UserID = reader.GetGuid(0),
+                    FirstName = reader.GetString(1),
+                    LastName = reader.GetString(2),
+                    Email = reader.GetString(3),
+                    MoveInDate = reader.GetDateTime(4),
+                    MoveOutDate = reader.IsDBNull(5) ? (DateTime?)null : reader.GetDateTime(5)
+                });
+            }
+
+            _connection.Close(); 
+            
+            return addressLivingHistory;
         }
     }
 }
