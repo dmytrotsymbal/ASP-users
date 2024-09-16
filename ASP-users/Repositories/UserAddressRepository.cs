@@ -4,13 +4,13 @@ using MySqlConnector;
 
 namespace ASP_users.Repositories
 {
-    public class UserAddressRepository : BaseRepository, IUserAddressRepository
+    public class UserAddressRepository : BaseRepository, IAddressRepository
     {
         public UserAddressRepository(MySqlConnection connection) : base(connection) { }
 
-        public async Task<IEnumerable<DetailedUserAddress>> GetUserAddresses(Guid userId)
+        public async Task<IEnumerable<Address>> GetUserAddresses(Guid userId)
         {
-            var userAddressDetails = new List<DetailedUserAddress>();
+            var userAddressDetails = new List<Address>();
 
             var command = CreateCommand(
                 @"SELECT addresses.AddressID,
@@ -29,7 +29,9 @@ namespace ASP_users.Repositories
                  FROM 
 	                     Addresses addresses INNER JOIN UserAddresses useraddresses ON addresses.AddressID = useraddresses.AddressID
                  WHERE 
-                         useraddresses.UserID = @UserID");
+                         useraddresses.UserID = @UserID
+                 ORDER BY
+                         useraddresses.MoveInDate DESC");
 
             command.Parameters.AddWithValue("@UserID", userId);
 
@@ -39,12 +41,12 @@ namespace ASP_users.Repositories
 
             while (await reader.ReadAsync())
             {
-                userAddressDetails.Add(new DetailedUserAddress
+                userAddressDetails.Add(new Address
                 {
                     AddressID = reader.GetInt32(0),
                     UserID = reader.GetGuid(1),
                     StreetAddress = reader.GetString(2),
-                    HouseNumber = reader.IsDBNull(3) ? (int?)null : reader.GetInt32(3), // Чтение HouseNumber
+                    HouseNumber = reader.IsDBNull(3) ? (int?)null : reader.GetInt32(3),
                     ApartmentNumber = reader.IsDBNull(4) ? (int?)null : reader.GetInt32(4),
                     City = reader.GetString(5),
                     State = reader.GetString(6),
@@ -63,31 +65,59 @@ namespace ASP_users.Repositories
         }
 
 
-        public async Task AddUserAddress(UserAddress userAddress)
+
+        public async Task<Address> GetUserAddressById(int addressId)
         {
+            Address detailedAddress = null;
+
             var command = CreateCommand(
-                @"INSERT INTO UserAddresses (UserID, AddressID, MoveInDate, MoveOutDate)
-              VALUES (@UserID, @AddressID, @MoveInDate, @MoveOutDate)");
-            command.Parameters.AddWithValue("@UserID", userAddress.UserID);
-            command.Parameters.AddWithValue("@AddressID", userAddress.AddressID);
-            command.Parameters.AddWithValue("@MoveInDate", userAddress.MoveInDate);
-            command.Parameters.AddWithValue("@MoveOutDate", userAddress.MoveOutDate);
+                @"SELECT 
+                    addresses.AddressID,
+                    useraddresses.UserID,
+                    addresses.StreetAddress,
+                    addresses.HouseNumber,
+                    addresses.ApartmentNumber,
+                    addresses.City,
+                    addresses.State,
+                    addresses.PostalCode,
+                    addresses.Country,
+                    addresses.Latitude,
+                    addresses.Longitude,
+                    useraddresses.MoveInDate,
+                    useraddresses.MoveOutDate
+                FROM 
+                    Addresses addresses INNER JOIN UserAddresses useraddresses ON addresses.AddressID = useraddresses.AddressID
+                WHERE 
+                    useraddresses.AddressID = @AddressID"
+            );
+            command.Parameters.AddWithValue("@AddressID", addressId);
 
             _connection.Open();
-            await command.ExecuteNonQueryAsync();
-            _connection.Close();
-        }
 
-        public async Task RemoveUserAddress(int userAddressID)
-        {
-            var command = CreateCommand(
-                @"DELETE FROM UserAddresses WHERE UserAddressID = @UserAddressID");
-            command.Parameters.AddWithValue("@UserAddressID", userAddressID);
+            var reader = await command.ExecuteReaderAsync();
 
-            _connection.Open();
-            await command.ExecuteNonQueryAsync();
+            if (await reader.ReadAsync())
+            {
+                detailedAddress = new Address
+                {
+                    AddressID = reader.GetInt32(0),
+                    UserID = reader.GetGuid(1),
+                    StreetAddress = reader.GetString(2),
+                    HouseNumber = reader.IsDBNull(3) ? (int?)null : reader.GetInt32(3),
+                    ApartmentNumber = reader.IsDBNull(4) ? (int?)null : reader.GetInt32(4),
+                    City = reader.GetString(5),
+                    State = reader.GetString(6),
+                    PostalCode = reader.GetString(7),
+                    Country = reader.GetString(8),
+                    Latitude = reader.IsDBNull(9) ? (decimal?)null : reader.GetDecimal(9),
+                    Longitude = reader.IsDBNull(10) ? (decimal?)null : reader.GetDecimal(10),
+                    MoveInDate = reader.GetDateTime(11),
+                    MoveOutDate = reader.IsDBNull(12) ? (DateTime?)null : reader.GetDateTime(12)
+                };
+            }
             _connection.Close();
+
+            return detailedAddress;
         }
     }
-
 }

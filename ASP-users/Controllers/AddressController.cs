@@ -9,9 +9,9 @@ namespace ASP_users.Controllers
     [ApiController]
     public class AddressController : ControllerBase
     {
-        private readonly IUserAddressRepository _userAddressRepository;
+        private readonly IAddressRepository _userAddressRepository;
 
-        public AddressController(IUserAddressRepository userAddressRepository)
+        public AddressController(IAddressRepository userAddressRepository)
         {
             _userAddressRepository = userAddressRepository;
         }
@@ -20,15 +20,41 @@ namespace ASP_users.Controllers
 
 
 
-        [HttpGet("GetAllUsersAddresses/{userId}")]
+        [HttpGet("get-all/{userId}")]
         public async Task<IActionResult> GetUserAddresses(Guid userId)
         {
-            var usersAddresses = await _userAddressRepository.GetUserAddresses(userId);
-            if (usersAddresses == null)
+            try
             {
-                return NotFound();
+                var usersAddresses = await _userAddressRepository.GetUserAddresses(userId);
+                if (usersAddresses == null)
+                {
+                    return NotFound();
+                }
+                return Ok(usersAddresses);
+            } 
+            catch (Exception ex) {
+                return BadRequest(ex);
             }
-            return Ok(usersAddresses);
         }
+
+
+
+        [HttpGet("get-by-id/{addressId}")]
+        public async Task<IActionResult> GetUserAddressById(int addressId)
+        {
+            try
+            {
+                var usersAddress = await _userAddressRepository.GetUserAddressById(addressId);
+                if (usersAddress == null)
+                {
+                    return NotFound();
+                }
+                return Ok(usersAddress);
+            } 
+            catch (Exception ex) {
+                return BadRequest(ex);
+            }
+        }
+
     }
 }
