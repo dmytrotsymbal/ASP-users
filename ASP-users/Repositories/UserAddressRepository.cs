@@ -286,5 +286,25 @@ namespace ASP_users.Repositories
 
             _connection.Close();
         }
+
+
+
+        public async Task RemoveAddressFromUser(Guid userId, int addressId)
+        {
+            var command = CreateCommand(
+            @"DELETE FROM 
+                UserAddresses
+              WHERE     
+                UserID = @UserID AND AddressID = @AddressID");
+
+            command.Parameters.AddWithValue("@UserID", userId);
+            command.Parameters.AddWithValue("@AddressID", addressId);
+
+            _connection.Open();
+
+            await command.ExecuteNonQueryAsync();
+
+            _connection.Close();
+        }
     }
 }

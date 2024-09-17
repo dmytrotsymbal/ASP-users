@@ -1,6 +1,5 @@
 ﻿using ASP_users.Interfaces;
 using ASP_users.Models;
-using ASP_users.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ASP_users.Controllers
@@ -15,9 +14,6 @@ namespace ASP_users.Controllers
         {
             _userAddressRepository = userAddressRepository;
         }
-
-
-
 
 
         [HttpGet("get-all/{userId}")]
@@ -96,9 +92,6 @@ namespace ASP_users.Controllers
 
 
 
-
-
-
         [HttpPost("add/{userId}")]
         public async Task<IActionResult> AddAddressToUser(Guid userId, Address address)
         {
@@ -115,5 +108,22 @@ namespace ASP_users.Controllers
             }
         }
 
+
+
+        [HttpDelete("remove/{addressId}/from-user/{userId}")]
+        public async Task<IActionResult> RemoveAddressFromUser(Guid userId, int addressId)
+        {
+            try
+            {
+                await _userAddressRepository.RemoveAddressFromUser(userId, addressId);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error deleting address: {ex.Message}");
+
+                return StatusCode(500, new { message = "An error occurred while deleting the address.", details = ex.Message });
+            }
+        }
     }
 }

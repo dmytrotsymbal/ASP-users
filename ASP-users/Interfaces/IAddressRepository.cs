@@ -16,6 +16,8 @@ namespace ASP_users.Interfaces
 
 
         Task AddAddressToUser(Guid userId, Address address);
-         
+        
+
+        Task RemoveAddressFromUser(Guid userId, int addressId); // метод для видалення адреси з історії проживання певного юзера
     }
 }

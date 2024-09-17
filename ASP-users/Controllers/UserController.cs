@@ -19,8 +19,15 @@ namespace ASP_users.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllUsers(int pageNumber = 1, int pageSize = 10)
         {
-            var users = await _userRepository.GetAllUsers(pageNumber, pageSize);
-            return Ok(users);
+            try
+            {
+                var users = await _userRepository.GetAllUsers(pageNumber, pageSize);
+                return Ok(users);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
 
@@ -28,12 +35,19 @@ namespace ASP_users.Controllers
         [HttpGet("{userId}")]
         public async Task<IActionResult> GetUserById(Guid userId)
         {
-            var user = await _userRepository.GetUserById(userId);
-            if (user == null)
+            try
             {
-                return NotFound();
+                var user = await _userRepository.GetUserById(userId);
+                if (user == null)
+                {
+                    return NotFound();
+                }
+                return Ok(user);
             }
-            return Ok(user);
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
 
@@ -41,12 +55,19 @@ namespace ASP_users.Controllers
         [HttpGet("search")]
         public async Task<IActionResult> SearchUser(string searchQuery)
         {
-            var user = await _userRepository.SearchUsers(searchQuery);
-            if (user == null)
+            try
             {
-                return NotFound();
+                var user = await _userRepository.SearchUsers(searchQuery);
+                if (user == null)
+                {
+                    return NotFound();
+                }
+                return Ok(user);
             }
-            return Ok(user);
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
 
@@ -88,13 +109,20 @@ namespace ASP_users.Controllers
         [HttpPut("{userId}")]
         public async Task<IActionResult> UpdateUser(Guid userId, [FromBody] User user)
         {
-            if (user.UserID != userId)
+            try
             {
-                return BadRequest("User ID mismatch");
-            }
+                if (user.UserID != userId)
+                {
+                    return BadRequest("User ID mismatch");
+                }
 
-            await _userRepository.UpdateUser(userId, user);
-            return NoContent();
+                await _userRepository.UpdateUser(userId, user);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
 
@@ -102,8 +130,15 @@ namespace ASP_users.Controllers
         [HttpDelete("{userId}")]
         public async Task<IActionResult> DeleteUser(Guid userId)
         {
-            await _userRepository.DeleteUser(userId);
-            return NoContent();
+            try
+            {
+                await _userRepository.DeleteUser(userId);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
 
@@ -115,12 +150,19 @@ namespace ASP_users.Controllers
         [HttpGet("check-email")]
         public async Task<IActionResult> CheckEmailExists(string email)
         {
-            var user = await _userRepository.GetUserByEmail(email); // викликаємо метод для пошуку користувача по email
-            if (user != null) // якщо користувач знайдений
+            try
             {
-                return Conflict(new { message = "Такий Email вже існує" }); // повертаємо конфлікт з повідомленням
+                var user = await _userRepository.GetUserByEmail(email); // викликаємо метод для пошуку користувача по email
+                if (user != null) // якщо користувач знайдений
+                {
+                    return Conflict(new { message = "Такий Email вже існує" }); // повертаємо конфлікт з повідомленням
+                }
+                return Ok(); // якщо користувача не знайдено, повертаємо ОК
             }
-            return Ok(); // якщо користувача не знайдено, повертаємо ОК
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
 
@@ -128,8 +170,15 @@ namespace ASP_users.Controllers
         [HttpGet("quantity")]
         public async Task<IActionResult> GetUsersCount()
         {
-            int usersCount = await _userRepository.GetUsersCount();
-            return Ok(usersCount);
+            try
+            {
+                var count = await _userRepository.GetUsersCount(); // викликаємо метод для знаходження кількості користувачів
+                return Ok(count);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
     }
 }
