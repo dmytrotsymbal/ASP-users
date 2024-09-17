@@ -59,7 +59,6 @@ namespace ASP_users.Controllers
 
 
         [HttpGet("get-living-history/{addressId}")]
-
         public async Task<IActionResult> GetAddressLivingHistory(int addressId)
         {
             try
@@ -75,5 +74,46 @@ namespace ASP_users.Controllers
                 return BadRequest(ex);
             }
         }
+
+
+
+        [HttpPut("update/{addressId}")]
+        public async Task UpdateAddress(int addressId, [FromBody] Address address)
+        {
+            try
+            {
+                if (address.AddressID != addressId)
+                {
+                    throw new Exception("Address ID mismatch");
+                }
+                await _userAddressRepository.UpdateAddress(addressId, address);
+            } 
+            catch (Exception ex) 
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+
+
+
+
+
+        [HttpPost("add/{userId}")]
+        public async Task<IActionResult> AddAddressToUser(Guid userId, Address address)
+        {
+            try
+            {
+                await _userAddressRepository.AddAddressToUser(userId, address);
+                return CreatedAtAction("GetUserAddressById", new { addressId = address.AddressID }, address);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error adding address: {ex.Message}");
+
+                return StatusCode(500, new { message = "An error occurred while adding the address.", details = ex.Message });
+            }
+        }
+
     }
 }
