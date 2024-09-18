@@ -357,5 +357,27 @@ namespace ASP_users.Repositories
             return count;
         }
 
+
+        public async Task<IEnumerable<Guid>> GetAllUsersIDs()
+        {
+            var idsList = new List<Guid>();
+
+            var command = CreateCommand(
+                @"SELECT UserID FROM Users"
+            );
+
+            _connection.Open();
+
+            using var reader = await command.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
+            {
+                idsList.Add(reader.GetGuid(0));
+            }
+
+            _connection.Close();
+
+            return idsList;
+        }
     }
 }

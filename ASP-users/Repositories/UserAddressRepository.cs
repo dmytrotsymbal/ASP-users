@@ -305,5 +305,31 @@ namespace ASP_users.Repositories
 
             _connection.Close();
         }
+
+
+
+        public async Task AddExistingUserToLivingHistory(Guid userId, int addressId, DateTime moveInDate, DateTime? moveOutDate)
+        {
+            var command = CreateCommand(
+                @"INSERT INTO UserAddresses (
+                    UserID,
+                    AddressID,
+                    MoveInDate,
+                    MoveOutDate)
+                VALUES (
+                    @UserID,
+                    @AddressID,
+                    @MoveInDate, 
+                    @MoveOutDate)");
+
+            command.Parameters.AddWithValue("@UserID", userId);
+            command.Parameters.AddWithValue("@AddressID", addressId);
+            command.Parameters.AddWithValue("@MoveInDate", moveInDate);
+            command.Parameters.AddWithValue("@MoveOutDate", moveOutDate ?? (object)DBNull.Value);
+
+            _connection.Open();
+            await command.ExecuteNonQueryAsync();
+            _connection.Close();
+        }
     }
 }

@@ -125,5 +125,27 @@ namespace ASP_users.Controllers
                 return StatusCode(500, new { message = "An error occurred while deleting the address.", details = ex.Message });
             }
         }
+
+
+
+        [HttpPost("add-existing-user/{addressId}")]
+        public async Task<IActionResult> AddExistingUserToLivingHistory(int addressId, [FromBody] AddUserToAddressRequest request)
+        {
+            try
+            {
+                await _userAddressRepository.AddExistingUserToLivingHistory(request.UserID, addressId, request.MoveInDate, request.MoveOutDate);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        public class AddUserToAddressRequest
+        {
+            public Guid UserID { get; set; }
+            public DateTime MoveInDate { get; set; }
+            public DateTime? MoveOutDate { get; set; }
+        }
     }
 }

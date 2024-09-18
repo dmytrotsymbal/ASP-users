@@ -17,5 +17,7 @@ namespace ASP_users.Interfaces
         Task<User> GetUserByEmail(string email);
 
         Task<int> GetUsersCount();
+
+        Task<IEnumerable<Guid>> GetAllUsersIDs();
     }
 }

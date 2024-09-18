@@ -180,5 +180,21 @@ namespace ASP_users.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+
+
+
+        [HttpGet("get-all-ids")]
+        public async Task<IActionResult> GetAllUsersIDs()
+        {
+            try
+            {
+                var ids = await _userRepository.GetAllUsersIDs();
+                return Ok(ids);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
     }
 }
