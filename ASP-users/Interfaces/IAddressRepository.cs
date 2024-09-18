@@ -4,17 +4,26 @@ namespace ASP_users.Interfaces
 {
     public interface IAddressRepository
     {
-        Task<IEnumerable<Address>> GetUserAddresses(Guid userId);
 
-        Task<Address> GetUserAddressById(int andressId);
 
-        Task<IEnumerable<Resident>> GetAddressLivingHistory(int andressId);
+        // -- МЕТОДИ ЯКІ ВИКОРИСТОВУЮТЬСЯ НА СТОРІНЦІ ЮЗЕРА В АДРЕСНОМУ АККАРДІОНІ
+        Task<IEnumerable<Address>> GetUserAddresses(Guid userId); // отримання списку адрес певного юзера
 
-        Task UpdateAddress(int addressId, Address address);
+        Task<Address> GetUserAddressById(Guid userId, int andressId); // отримання адреси по ІД (потрібно для створення окремої сторінки і форми редагування)
 
-        Task AddAddressToUser(Guid userId, Address address);
+        Task UpdateAddress(int addressId, Address address); // оновлення інформації одразу в двух таблицях
+
+        Task AddAddressToUser(Guid userId, Address address); // створення запису одразу в двух таблицях
+
+        Task RemoveAddressFromUser(Guid userId, int addressId); // видалення адреси з історії проживання але сама адреса залишається в базі (виделанні зв'язку)
+
         
-        Task RemoveAddressFromUser(Guid userId, int addressId); // метод для видалення адреси з історії проживання певного юзера
+        
+        
+        
+        // -- МЕТОДИ ЯКІ ВИКОРИСТОВУЮТЬСЯ НА СТОРІНЦІ АДРЕСИ ТА В АККАРДІОНІ ІСТОРІЇ ПРОЖИВАННЯ
+
+        Task<IEnumerable<Resident>> GetAddressLivingHistory(int andressId); // аккардіон історії проживання на сторінці адреси
 
         Task AddExistingUserToLivingHistory(Guid userId, int addressId, DateTime moveInDate, DateTime? moveOutDate); // метод для додавання нового проживача в історію проживання певного адресу
     }

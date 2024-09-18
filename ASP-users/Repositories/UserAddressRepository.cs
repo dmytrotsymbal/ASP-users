@@ -66,7 +66,7 @@ namespace ASP_users.Repositories
 
 
 
-        public async Task<Address> GetUserAddressById(int addressId)
+        public async Task<Address> GetUserAddressById(Guid userId, int addressId)
         {
             Address detailedAddress = null;
 
@@ -88,8 +88,10 @@ namespace ASP_users.Repositories
                 FROM 
                     Addresses addresses INNER JOIN UserAddresses useraddresses ON addresses.AddressID = useraddresses.AddressID
                 WHERE 
-                    useraddresses.AddressID = @AddressID"
+                    useraddresses.AddressID = @AddressID AND useraddresses.UserID = @UserID"
             );
+
+            command.Parameters.AddWithValue("@UserID", userId);
             command.Parameters.AddWithValue("@AddressID", addressId);
 
             _connection.Open();
@@ -246,7 +248,7 @@ namespace ASP_users.Repositories
                     @Country, 
                     @Latitude, 
                     @Longitude);
-                SELECT LAST_INSERT_ID();"); // Отримуємо ID щойно доданої адреси
+                SELECT LAST_INSERT_ID();"); // ІД щойно доданої адреси
 
             command.Parameters.AddWithValue("@StreetAddress", address.StreetAddress);
             command.Parameters.AddWithValue("@HouseNumber", address.HouseNumber);

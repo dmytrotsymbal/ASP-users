@@ -35,12 +35,12 @@ namespace ASP_users.Controllers
 
 
 
-        [HttpGet("get-by-id/{addressId}")]
-        public async Task<IActionResult> GetUserAddressById(int addressId)
+        [HttpGet("get-by-id/{addressId}/for-user/{userId}")]
+        public async Task<IActionResult> GetUserAddressById(Guid userId, int addressId)
         {
             try
             {
-                var usersAddress = await _userAddressRepository.GetUserAddressById(addressId);
+                var usersAddress = await _userAddressRepository.GetUserAddressById(userId, addressId);
                 if (usersAddress == null)
                 {
                     return NotFound();
