@@ -4,8 +4,6 @@ namespace ASP_users.Interfaces
 {
     public interface IAddressRepository
     {
-
-
         // -- МЕТОДИ ЯКІ ВИКОРИСТОВУЮТЬСЯ НА СТОРІНЦІ ЮЗЕРА В АДРЕСНОМУ АККАРДІОНІ
         Task<IEnumerable<Address>> GetUserAddresses(Guid userId); // отримання списку адрес певного юзера
 
@@ -26,5 +24,7 @@ namespace ASP_users.Interfaces
         Task<IEnumerable<Resident>> GetAddressLivingHistory(int andressId); // аккардіон історії проживання на сторінці адреси
 
         Task AddExistingUserToLivingHistory(Guid userId, int addressId, DateTime moveInDate, DateTime? moveOutDate); // метод для додавання нового проживача в історію проживання певного адресу
+
+        Task TotalDeleteWholeAddress(int addressId); // метод для видалення адреси з бази даних (видалення із бази даних із відповідних таблиць)
     }
 }

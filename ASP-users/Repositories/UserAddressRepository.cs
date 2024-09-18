@@ -333,5 +333,34 @@ namespace ASP_users.Repositories
             await command.ExecuteNonQueryAsync();
             _connection.Close();
         }
+
+
+        public async Task TotalDeleteWholeAddress(int addressId)
+        {
+            var command = CreateCommand(
+                @"DELETE FROM 
+                    Addresses
+                  WHERE 
+                    AddressID = @AddressID");
+
+            command.Parameters.AddWithValue("@AddressID", addressId);
+
+            _connection.Open();
+
+            await command.ExecuteNonQueryAsync();
+
+            // Також видаляємо всі записи з таблиці UserAddresses, що відносяться до цієї адреси
+            var command2 = CreateCommand(
+                @"DELETE FROM 
+                    UserAddresses
+                  WHERE 
+                    AddressID = @AddressID");
+
+            command2.Parameters.AddWithValue("@AddressID", addressId);
+
+            await command2.ExecuteNonQueryAsync();
+
+            _connection.Close();
+        }
     }
 }

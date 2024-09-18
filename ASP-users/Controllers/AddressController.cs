@@ -147,5 +147,25 @@ namespace ASP_users.Controllers
             public DateTime MoveInDate { get; set; }
             public DateTime? MoveOutDate { get; set; }
         }
+
+
+
+
+        [HttpDelete("total-delete/{addressId}")]
+
+        public async Task<IActionResult> TotalDeleteAddress(int addressId)
+        {
+            try
+            {
+                await _userAddressRepository.TotalDeleteWholeAddress(addressId);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error deleting address: {ex.Message}");
+
+                return StatusCode(500, new { message = "An error occurred while deleting the address.", details = ex.Message });
+            }
+        }
     }
 }
