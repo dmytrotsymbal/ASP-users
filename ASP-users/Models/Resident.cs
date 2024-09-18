@@ -1,4 +1,4 @@
-﻿namespace ASP_users.Models.Helpers
+﻿namespace ASP_users.Models
 {
     public class Resident
     {
