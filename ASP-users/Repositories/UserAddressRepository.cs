@@ -66,12 +66,13 @@ namespace ASP_users.Repositories
 
 
 
-        public async Task<Address> GetUserAddressById(Guid userId, int addressId)
+        public async Task<Address> GetUserAddressById(Guid? userId, int addressId)
         {
             Address detailedAddress = null;
 
-            var command = CreateCommand(
-                @"SELECT 
+            // Формуємо SQL-запит на основі наявності userId
+            string query = @"
+                SELECT 
                     addresses.AddressID,
                     useraddresses.UserID,
                     addresses.StreetAddress,
@@ -86,13 +87,28 @@ namespace ASP_users.Repositories
                     useraddresses.MoveInDate,
                     useraddresses.MoveOutDate
                 FROM 
-                    Addresses addresses INNER JOIN UserAddresses useraddresses ON addresses.AddressID = useraddresses.AddressID
+                    Addresses addresses 
+                INNER JOIN 
+                    UserAddresses useraddresses 
+                ON 
+                    addresses.AddressID = useraddresses.AddressID
                 WHERE 
-                    useraddresses.AddressID = @AddressID AND useraddresses.UserID = @UserID"
-            );
+                    useraddresses.AddressID = @AddressID";
 
-            command.Parameters.AddWithValue("@UserID", userId);
+            // Додаємо умову для userId, якщо вона передана
+            if (userId.HasValue)
+            {
+                query += " AND useraddresses.UserID = @UserID";
+            }
+
+            var command = CreateCommand(query);
+
             command.Parameters.AddWithValue("@AddressID", addressId);
+
+            if (userId.HasValue)
+            {
+                command.Parameters.AddWithValue("@UserID", userId.Value);
+            }
 
             _connection.Open();
 
@@ -117,10 +133,12 @@ namespace ASP_users.Repositories
                     MoveOutDate = reader.IsDBNull(12) ? (DateTime?)null : reader.GetDateTime(12)
                 };
             }
+
             _connection.Close();
 
             return detailedAddress;
         }
+
 
 
 

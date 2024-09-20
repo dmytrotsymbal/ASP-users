@@ -7,7 +7,7 @@ namespace ASP_users.Interfaces
         // -- МЕТОДИ ЯКІ ВИКОРИСТОВУЮТЬСЯ НА СТОРІНЦІ ЮЗЕРА В АДРЕСНОМУ АККАРДІОНІ
         Task<IEnumerable<Address>> GetUserAddresses(Guid userId); // отримання списку адрес певного юзера
 
-        Task<Address> GetUserAddressById(Guid userId, int andressId); // отримання адреси по ІД (потрібно для створення окремої сторінки і форми редагування)
+        Task<Address> GetUserAddressById(Guid? userId, int andressId); // для відкриття форми редагування userId потрібен, а для сторінки з мапою ні тому userId опційний параметр
 
         Task UpdateAddress(int addressId, Address address); // оновлення інформації одразу в двух таблицях
 

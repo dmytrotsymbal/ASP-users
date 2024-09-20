@@ -36,8 +36,8 @@ namespace ASP_users.Controllers
 
 
 
-        [HttpGet("get-by-id/{addressId}/for-user/{userId}")]
-        public async Task<IActionResult> GetUserAddressById(Guid userId, int addressId)
+        [HttpGet("get-by-id/{addressId}/for-user/{userId?}")]
+        public async Task<IActionResult> GetUserAddressById(Guid? userId, int addressId)
         {
             try
             {
@@ -47,11 +47,15 @@ namespace ASP_users.Controllers
                     return NotFound();
                 }
                 return Ok(usersAddress);
-            } 
-            catch (Exception ex) {
-                return BadRequest(ex);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
             }
         }
+
+
+
 
 
 
