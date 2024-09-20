@@ -1,5 +1,6 @@
 ﻿using ASP_users.Interfaces;
 using ASP_users.Models;
+using ASP_users.Models.DTO;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ASP_users.Controllers
@@ -129,23 +130,21 @@ namespace ASP_users.Controllers
 
 
         [HttpPost("add-existing-user/{addressId}")]
-        public async Task<IActionResult> AddExistingUserToLivingHistory(int addressId, [FromBody] AddUserToAddressRequest request)
+        public async Task<IActionResult> AddExistingUserToLivingHistory(int addressId, [FromBody] AddressToUserDTO addressToUserDTO)
         {
             try
             {
-                await _userAddressRepository.AddExistingUserToLivingHistory(request.UserID, addressId, request.MoveInDate, request.MoveOutDate);
+                await _userAddressRepository.AddExistingUserToLivingHistory(
+                    addressToUserDTO.UserID, 
+                    addressId, 
+                    addressToUserDTO.MoveInDate, 
+                    addressToUserDTO.MoveOutDate);
                 return Ok();
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
-        }
-        public class AddUserToAddressRequest
-        {
-            public Guid UserID { get; set; }
-            public DateTime MoveInDate { get; set; }
-            public DateTime? MoveOutDate { get; set; }
         }
 
 

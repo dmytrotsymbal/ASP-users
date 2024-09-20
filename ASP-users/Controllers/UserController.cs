@@ -1,5 +1,6 @@
 ﻿using ASP_users.Interfaces;
 using ASP_users.Models;
+using ASP_users.Models.DTO;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ASP_users.Controllers
@@ -51,7 +52,7 @@ namespace ASP_users.Controllers
         }
 
 
-        //метод для пошуку користувача по інмені і прізвищу
+
         [HttpGet("search")]
         public async Task<IActionResult> SearchUser(string searchQuery)
         {
@@ -75,32 +76,30 @@ namespace ASP_users.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateUser(UserDTO userDto)
         {
-            if (!ModelState.IsValid) // перевірка валідності вхідних даних
+            try
             {
-                return BadRequest(ModelState); 
+                if (!ModelState.IsValid) // перевірка валідності вхідних даних
+                {
+                    return BadRequest(ModelState);
+                }
+
+                var createdUser = new User     // cтворення нового користувача на основі UserDTO
+                {
+                    UserID = Guid.NewGuid(),  // генерується автоматично
+                    FirstName = userDto.FirstName,
+                    LastName = userDto.LastName,
+                    Email = userDto.Email,
+                    DateOfBirth = userDto.DateOfBirth,
+                    CreatedAt = DateTime.Now   // генерується автоматично
+                };
+
+                await _userRepository.CreateUser(createdUser); 
+                return CreatedAtAction(nameof(GetAllUsers), new { id = createdUser.UserID }, createdUser.UserID); 
             }
-
-            // Створення нового користувача на основі UserDTO
-            var user = new User
+            catch (Exception ex)
             {
-                UserID = Guid.NewGuid(),
-                FirstName = userDto.FirstName,
-                LastName = userDto.LastName,
-                Email = userDto.Email,
-                DateOfBirth = userDto.DateOfBirth,
-                CreatedAt = DateTime.Now // Додаємо дату створення
-            };
-
-            await _userRepository.CreateUser(user); // викликаємо метод для створення користувача
-            return CreatedAtAction(nameof(GetAllUsers), new { id = user.UserID }, user.UserID); // повертаємо створеного користувача
-        }
-
-        public class UserDTO 
-        {
-            public string FirstName { get; set; }
-            public string LastName { get; set; }
-            public string Email { get; set; }
-            public DateTime DateOfBirth { get; set; }
+                return StatusCode(500, ex.Message);
+            }
         }
 
 
