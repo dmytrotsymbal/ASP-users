@@ -36,17 +36,18 @@ namespace ASP_users.Controllers
 
 
 
-        [HttpGet("get-by-id/{addressId}/for-user/{userId?}")]
-        public async Task<IActionResult> GetUserAddressById(Guid? userId, int addressId)
+        // ЮРЛ для получения адреса по ID без указания юзера (для отдельной страницы)
+        [HttpGet("get-by-id/{addressId}")]
+        public async Task<IActionResult> GetAddressById(int addressId)
         {
             try
             {
-                var usersAddress = await _userAddressRepository.GetUserAddressById(userId, addressId);
-                if (usersAddress == null)
+                var address = await _userAddressRepository.GetUserAddressById(null, addressId);
+                if (address == null)
                 {
                     return NotFound();
                 }
-                return Ok(usersAddress);
+                return Ok(address);
             }
             catch (Exception ex)
             {
@@ -54,6 +55,24 @@ namespace ASP_users.Controllers
             }
         }
 
+        // ЮРЛ для получения адреса по ID в котором указіваться ID юзера (для форми редактирования)
+        [HttpGet("get-by-id/{addressId}/for-user/{userId}")]
+        public async Task<IActionResult> GetUserAddressById(Guid userId, int addressId)
+        {
+            try
+            {
+                var address = await _userAddressRepository.GetUserAddressById(userId, addressId);
+                if (address == null)
+                {
+                    return NotFound();
+                }
+                return Ok(address);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
 
 

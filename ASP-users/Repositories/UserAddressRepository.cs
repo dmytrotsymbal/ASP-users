@@ -70,8 +70,8 @@ namespace ASP_users.Repositories
         {
             Address detailedAddress = null;
 
-            // Формуємо SQL-запит на основі наявності userId
-            string query = @"
+            // запит якщо БЕЗ userId
+            string query = @"    
                 SELECT 
                     addresses.AddressID,
                     useraddresses.UserID,
@@ -95,19 +95,19 @@ namespace ASP_users.Repositories
                 WHERE 
                     useraddresses.AddressID = @AddressID";
 
-            // Додаємо умову для userId, якщо вона передана
+            // додається рядок якщо UserID є заданим
             if (userId.HasValue)
             {
                 query += " AND useraddresses.UserID = @UserID";
             }
 
-            var command = CreateCommand(query);
+            var command = CreateCommand(query); // формуємо з попереднього запиту ПОВНОЦІННУ команду
 
-            command.Parameters.AddWithValue("@AddressID", addressId);
+            command.Parameters.AddWithValue("@AddressID", addressId); // описуємо параметр який приходить завжди
 
             if (userId.HasValue)
             {
-                command.Parameters.AddWithValue("@UserID", userId.Value);
+                command.Parameters.AddWithValue("@UserID", userId.Value); // описуємо параметр який приходить НЕ завжди
             }
 
             _connection.Open();
@@ -140,27 +140,25 @@ namespace ASP_users.Repositories
         }
 
 
-
-
         public async Task<IEnumerable<Resident>> GetAddressLivingHistory(int addressId)
         {
             var addressLivingHistory = new List<Resident>();
 
             var command = CreateCommand(
                 @"SELECT 
-	                u.UserID, 
-	                u.FirstName, 
-	                u.LastName, 
-	                u.Email,
-	                ua.MoveInDate,
-	                ua.MoveOutDate
-                FROM 
-	                users u JOIN UserAddresses ua ON u.UserID = ua.UserID
-	                JOIN Addresses a ON ua.AddressID = a.AddressID
-                WHERE 
-	                a.AddressID = @AddressID
-                ORDER BY 
-	                ua.MoveInDate DESC;");
+		            users.UserID, 
+		            users.FirstName, 
+		            users.LastName,
+		            users.Email, 
+		            useraddresses.MoveInDate, 
+		            useraddresses.MoveOutDate 
+                 FROM 
+		            users INNER JOIN useraddresses ON users.UserID = useraddresses.UserID 
+		            JOIN addresses ON useraddresses.AddressID = addresses.AddressID
+                 WHERE 
+		            addresses.AddressID = @AddressID
+                 ORDER BY
+		            useraddresses.MoveInDate DESC;");
 
             command.Parameters.AddWithValue("@AddressID", addressId);
 
