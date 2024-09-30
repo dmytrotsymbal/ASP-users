@@ -166,7 +166,7 @@ namespace ASP_users.Repositories
                  FROM 
                     users LEFT JOIN photos ON users.UserID = photos.UserID 
                  WHERE 
-                    users.FirstName LIKE @SearchQuery OR users.LastName LIKE @SearchQuery 
+                    users.FirstName LIKE @SearchQuery OR users.LastName LIKE @SearchQuery OR users.UserID LIKE @SearchQuery
                  ORDER BY 
                     users.UserID"
             );
