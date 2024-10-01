@@ -16,81 +16,130 @@ namespace ASP_users.Controllers
         }
 
 
-        [HttpGet("GetAllCars")]
+        [HttpGet("get-all-cars")]
         public async Task<IActionResult> GetAllCars(int pageNumber, int pageSize)
         {
-            var cars = await _carRepository.GetAllCars(pageNumber, pageSize);
-            return Ok(cars);
+            try
+            {
+                var cars = await _carRepository.GetAllCars(pageNumber, pageSize);
+                return Ok(cars);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
 
-        [HttpGet("GetCarById/{carId}")]
+        [HttpGet("get-by-id/{carId}")]
         public async Task<IActionResult> GetCarById(int carId) 
         {
-            var car = await _carRepository.GetCarById(carId);
-            if (car == null)
+            try
             {
-                return NotFound();
+                var car = await _carRepository.GetCarById(carId);
+                if (car == null)
+                {
+                    return NotFound();
+                }
+                return Ok(car);
+            } 
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
             }
-            return Ok(car);
         }
 
 
-        [HttpGet("GetAllUsersCars/{userId}")]
+        [HttpGet("get-all-users-cars/{userId}")]
         public async Task<IActionResult> GetAllUsersCars(Guid userId)
         {
-            var userCars = await _carRepository.GetAllUsersCars(userId);
-            if (userCars == null)
+            try
             {
-                return NotFound();
+                var userCars = await _carRepository.GetAllUsersCars(userId);
+                if (userCars == null)
+                {
+                    return NotFound();
+                }
+                return Ok(userCars);
             }
-            return Ok(userCars);
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
 
-        [HttpGet("SearchCars")]
+        [HttpGet("search-cars")]
         public async Task<IActionResult> SearchCars(string searchQuery)
         {
-            var cars = await _carRepository.SearchCars(searchQuery);
-            if (cars == null)
+            try
             {
-                return NotFound();
+                var cars = await _carRepository.SearchCars(searchQuery);
+                if (cars == null)
+                {
+                    return NotFound();
+                }
+                return Ok(cars);
             }
-            return Ok(cars);
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
 
-        [HttpPut("UpdateCar/{CarId}")]
+        [HttpPut("update/{CarId}")]
         public async Task<IActionResult> UpdateCar(int carId, Car car)
         {
-            if (car.CarID != carId)
+            try
             {
-                return BadRequest("User ID mismatch");
+                if (car.CarID != carId)
+                {
+                    return BadRequest("User ID mismatch");
+                }
+                await _carRepository.UpdateCar(carId, car);
+                return NoContent();
             }
-            await _carRepository.UpdateCar(carId, car);
-            return NoContent();
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
 
-        [HttpPost("AddCarToUser/{userId}")]
+        [HttpPost("add/{userId}")]
         public async Task<IActionResult> AddCarToUser(Guid userId, [FromBody] Car car)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
-            }
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
 
-            car.UserID = userId; // Призначаємо UserID машині
-            await _carRepository.AddCarToUser(userId, car);
-            return Ok();
+                car.UserID = userId; // Призначаємо UserID машині
+                await _carRepository.AddCarToUser(userId, car);
+                return Ok();
+            } 
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
 
-        [HttpDelete("DeleteCar/{CarId}")]
+        [HttpDelete("delete/{CarId}")]
         public async Task<IActionResult> DeleteCar(int CarId)
         {
-            await _carRepository.DeleteCar(CarId);
-            return NoContent();
+            try
+            {
+                await _carRepository.DeleteCar(CarId);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
 
@@ -99,8 +148,15 @@ namespace ASP_users.Controllers
         [HttpGet("quantity")]
         public async Task<IActionResult> GetCarsCount()
         {
-            int carsCount = await _carRepository.GetCarsCount();
-            return Ok(carsCount);
+            try
+            {
+                int carsCount = await _carRepository.GetCarsCount();
+                return Ok(carsCount);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }
