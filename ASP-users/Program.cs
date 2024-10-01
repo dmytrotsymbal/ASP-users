@@ -17,6 +17,7 @@ builder.Services.AddScoped<IPhotoRepository, PhotoRepository>();
 builder.Services.AddScoped<IPhoneRepository, PhoneRepository>();
 builder.Services.AddScoped<ICarRepository, CarRepository>();
 builder.Services.AddScoped<IAddressRepository, UserAddressRepository>();
+builder.Services.AddScoped<ICriminalRecordRepository, CriminalRecordRepository>();
 
 
 var app = builder.Build();

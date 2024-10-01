@@ -1,6 +1,6 @@
 ﻿namespace ASP_users.Models
 {
-    public class CriminalRecords
+    public class CriminalRecord
     {
         public int CriminalRecordID { get; set; }
 

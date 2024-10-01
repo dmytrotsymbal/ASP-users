@@ -32,7 +32,7 @@ namespace ASP_users.Controllers
 
 
         [HttpGet("get-by-id/{carId}")]
-        public async Task<IActionResult> GetCarById(int carId) 
+        public async Task<IActionResult> GetCarById(int carId)
         {
             try
             {
@@ -42,7 +42,7 @@ namespace ASP_users.Controllers
                     return NotFound();
                 }
                 return Ok(car);
-            } 
+            }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
@@ -120,7 +120,7 @@ namespace ASP_users.Controllers
                 car.UserID = userId; // Призначаємо UserID машині
                 await _carRepository.AddCarToUser(userId, car);
                 return Ok();
-            } 
+            }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
