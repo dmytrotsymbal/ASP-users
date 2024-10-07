@@ -18,6 +18,6 @@
 
         public string Details { get; set; }
 
-        public int PrisonID { get; set; }
+        public Prison Prison { get; set; }
     }
 }

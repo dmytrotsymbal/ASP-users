@@ -14,19 +14,23 @@ namespace ASP_users.Repositories
 
             var command = CreateCommand(
                 @"SELECT 
-                    CriminalRecordID,
-                    UserID,
-                    Article,
-                    ConvictionDate,
-                    ReleaseDate,
-                    Sentence,
-                    CaseDetailsURL,
-                    PrisonID,
-                    Details
+                    criminalrecords.CriminalRecordID,
+                    criminalrecords.UserID,
+                    criminalrecords.Article,
+                    criminalrecords.ConvictionDate,
+                    criminalrecords.ReleaseDate,
+                    criminalrecords.Sentence,
+                    criminalrecords.CaseDetailsURL,
+                    criminalrecords.Details,
+                    prisons.PrisonID,
+                    prisons.PrisonName,
+                    prisons.Location,
+                    prisons.Capacity,
+                    prisons.SecurityLevel
                   FROM 
-                    Criminalrecords 
+                    criminalrecords LEFT JOIN prisons ON criminalrecords.PrisonID = prisons.PrisonID
                   WHERE 
-                    UserID = @UserID"
+                    criminalrecords.UserID = @UserID;"
             );
 
             command.Parameters.AddWithValue("@UserID", userId);
@@ -52,8 +56,15 @@ namespace ASP_users.Repositories
                         ReleaseDate = reader.IsDBNull(4) ? (DateTime?)null : reader.GetDateTime(4),
                         Sentence = reader.GetString(5),
                         CaseDetailsURL = reader.IsDBNull(6) ? (string?)null : reader.GetString(6),
-                        PrisonID = reader.GetInt32(7),
-                        Details = reader.GetString(8),
+                        Details = reader.GetString(7),
+                        Prison = new Prison
+                        {
+                            PrisonID = reader.GetInt32(8),
+                            PrisonName = reader.GetString(9),
+                            Location = reader.GetString(10),
+                            Capacity = reader.GetInt32(11),
+                            SecurityLevel = Enum.Parse<Prison.SecurityLevelEnum>(reader.GetString(12))
+                        }
                     };
                     usersCrimes.Add(criminalRecord);
                 }   
@@ -64,5 +75,62 @@ namespace ASP_users.Repositories
         }
 
 
+        public async Task<CriminalRecord> GetCriminalRecordById(int criminalRecordId)
+        {
+            CriminalRecord criminalRecord = null;
+
+            var command = CreateCommand(
+                @"SELECT 
+                    criminalrecords.CriminalRecordID,
+                    criminalrecords.UserID,
+                    criminalrecords.Article,
+                    criminalrecords.ConvictionDate,
+                    criminalrecords.ReleaseDate,
+                    criminalrecords.Sentence,
+                    criminalrecords.CaseDetailsURL,
+                    criminalrecords.Details,
+                    prisons.PrisonID,
+                    prisons.PrisonName,
+                    prisons.Location,
+                    prisons.Capacity,
+                    prisons.SecurityLevel
+                  FROM 
+                    criminalrecords LEFT JOIN prisons ON criminalrecords.PrisonID = prisons.PrisonID
+                  WHERE 
+                    criminalrecords.CriminalRecordID = @CriminalRecordID;"
+            );
+
+            command.Parameters.AddWithValue("@CriminalRecordID", criminalRecordId);
+
+            _connection.Open();
+
+            var reader = await command.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
+            {
+                criminalRecord = new CriminalRecord
+                {
+                    CriminalRecordID = reader.GetInt32(0),
+                    UserID = reader.GetGuid(1),
+                    Article = reader.GetString(2),
+                    ConvictionDate = reader.GetDateTime(3),
+                    ReleaseDate = reader.IsDBNull(4) ? (DateTime?)null : reader.GetDateTime(4),
+                    Sentence = reader.GetString(5),
+                    CaseDetailsURL = reader.IsDBNull(6) ? (string?)null : reader.GetString(6),
+                    Details = reader.GetString(7),
+                    Prison = new Prison
+                    {
+                        PrisonID = reader.GetInt32(8),
+                        PrisonName = reader.GetString(9),
+                        Location = reader.GetString(10),
+                        Capacity = reader.GetInt32(11),
+                        SecurityLevel = Enum.Parse<Prison.SecurityLevelEnum>(reader.GetString(12))
+                    }
+                };
+            }
+            _connection.Close();
+
+            return criminalRecord;
+        }
     }
 }

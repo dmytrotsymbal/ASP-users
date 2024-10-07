@@ -34,5 +34,25 @@ namespace ASP_users.Controllers
             }
         }
 
+
+
+
+        [HttpGet("get-crime-by-id/{criminalRecordId}")]
+        public async Task<IActionResult> GetCriminalRecordById(int criminalRecordId)
+        {
+            try
+            {
+                var criminalRecord = await _criminalRecordRepository.GetCriminalRecordById(criminalRecordId);
+                if (criminalRecord == null)
+                {
+                    return NotFound("Criminal record not found.");
+                }
+                return Ok(criminalRecord);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

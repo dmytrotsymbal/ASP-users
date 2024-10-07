@@ -5,5 +5,7 @@ namespace ASP_users.Interfaces
     public interface ICriminalRecordRepository
     {
         Task<IEnumerable<CriminalRecord>> GetAllUsersCriminalRecords(Guid userId);
+
+        Task<CriminalRecord> GetCriminalRecordById(int criminalRecordID);
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace ASP_users.Models
 {
-    public class Prisons
+    public class Prison
     {
         public int PrisonID { get; set; }
         public string PrisonName { get; set; }
