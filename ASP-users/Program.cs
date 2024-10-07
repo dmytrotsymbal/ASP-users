@@ -4,7 +4,13 @@ using MySqlConnector;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers() 
+    .AddJsonOptions(options => 
+    {
+        // доданий конвертер автоматично перетворюватиме всі enum у їхні текстові значення 
+        options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+    });
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
