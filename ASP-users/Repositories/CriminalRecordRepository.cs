@@ -132,5 +132,105 @@ namespace ASP_users.Repositories
 
             return criminalRecord;
         }
+
+
+        public async Task UpdateCriminalRecord(int criminalRecordId, CriminalRecord criminalRecord)
+        {
+            var command = CreateCommand(
+                @"UPDATE 
+                    criminalrecords 
+                  SET 
+                    UserID = @UserID,
+                    Article = @Article,
+                    ConvictionDate = @ConvictionDate,
+                    ReleaseDate = @ReleaseDate,
+                    Sentence = @Sentence,
+                    CaseDetailsURL = @CaseDetailsURL,
+                    Details = @Details,
+                    PrisonID = @PrisonID
+                  WHERE 
+                    CriminalRecordID = @CriminalRecordID;"
+            );
+
+            command.Parameters.AddWithValue("@CriminalRecordID", criminalRecordId);
+            command.Parameters.AddWithValue("@UserID", criminalRecord.UserID);
+            command.Parameters.AddWithValue("@Article", criminalRecord.Article);
+            command.Parameters.AddWithValue("@ConvictionDate", criminalRecord.ConvictionDate);
+            command.Parameters.AddWithValue("@ReleaseDate", criminalRecord.ReleaseDate);
+            command.Parameters.AddWithValue("@Sentence", criminalRecord.Sentence);
+            command.Parameters.AddWithValue("@CaseDetailsURL", criminalRecord.CaseDetailsURL);
+            command.Parameters.AddWithValue("@Details", criminalRecord.Details);
+            command.Parameters.AddWithValue("@PrisonID", criminalRecord.Prison.PrisonID);
+
+            _connection.Open();
+
+            await command.ExecuteNonQueryAsync();
+
+            _connection.Close();
+        }
+
+
+        public async Task AddCrimeToUser(Guid userId, CriminalRecord criminalRecord)
+        {
+            var command = CreateCommand(
+                @"INSERT INTO 
+                    criminalrecords (
+                        UserID,
+                        Article,
+                        ConvictionDate,
+                        ReleaseDate,
+                        Sentence,
+                        CaseDetailsURL,
+                        Details,
+                        PrisonID
+                    )
+                  VALUES 
+                    (
+                        @UserID,
+                        @Article,
+                        @ConvictionDate,
+                        @ReleaseDate,
+                        @Sentence,
+                        @CaseDetailsURL,
+                        @Details,
+                        @PrisonID
+                    );"
+            );
+
+            command.Parameters.AddWithValue("@UserID", userId);
+            command.Parameters.AddWithValue("@Article", criminalRecord.Article);
+            command.Parameters.AddWithValue("@ConvictionDate", criminalRecord.ConvictionDate);
+            command.Parameters.AddWithValue("@ReleaseDate", criminalRecord.ReleaseDate);
+            command.Parameters.AddWithValue("@Sentence", criminalRecord.Sentence);
+            command.Parameters.AddWithValue("@CaseDetailsURL", criminalRecord.CaseDetailsURL);
+            command.Parameters.AddWithValue("@Details", criminalRecord.Details);
+            command.Parameters.AddWithValue("@PrisonID", criminalRecord.Prison.PrisonID);
+
+            _connection.Open();
+
+            await command.ExecuteNonQueryAsync();
+
+            _connection.Close();
+        }
+
+
+
+        public async Task DeleteCriminalRecord(int criminalRecordId)
+        {
+            var command = CreateCommand(
+                @"DELETE FROM 
+                    criminalrecords 
+                  WHERE 
+                    CriminalRecordID = @CriminalRecordID;"
+            );
+
+            command.Parameters.AddWithValue("@CriminalRecordID", criminalRecordId);
+
+            _connection.Open();
+
+            await command.ExecuteNonQueryAsync();
+
+            _connection.Close();
+        }
     }
 }

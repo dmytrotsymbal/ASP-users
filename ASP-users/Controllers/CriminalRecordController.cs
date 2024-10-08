@@ -54,5 +54,67 @@ namespace ASP_users.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+
+
+
+        [HttpPut("update/{criminalRecordId}")]
+        public async Task<IActionResult> UpdateCriminalRecord(int criminalRecordId, [FromBody] CriminalRecord criminalRecord)
+        {
+            try
+            {
+                if (criminalRecord.CriminalRecordID != criminalRecordId)
+                {
+                    return BadRequest("User ID mismatch");
+                }
+                await _criminalRecordRepository.UpdateCriminalRecord(criminalRecordId, criminalRecord);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+
+
+        
+        [HttpPost("add-crime-to/{userId}")]
+        public async Task<IActionResult> AddCrimeToUser(Guid userId, [FromBody] CriminalRecord criminalRecord)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                criminalRecord.UserID = userId;
+                await _criminalRecordRepository.AddCrimeToUser(userId, criminalRecord);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+
+
+
+        [HttpDelete("delete/{criminalRecordId}")]
+        public async Task<IActionResult> DeleteCriminalRecord(int criminalRecordId)
+        {
+            try
+            {
+                await _criminalRecordRepository.DeleteCriminalRecord(criminalRecordId);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }
+
