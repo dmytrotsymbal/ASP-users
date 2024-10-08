@@ -1,4 +1,5 @@
 ﻿using ASP_users.Models;
+using ASP_users.Models.DTO;
 
 namespace ASP_users.Interfaces
 {
@@ -8,7 +9,7 @@ namespace ASP_users.Interfaces
 
         Task<CriminalRecord> GetCriminalRecordById(int criminalRecordID);
 
-        Task UpdateCriminalRecord(int criminalRecordID, CriminalRecord criminalRecord);
+        Task UpdateCriminalRecord(int criminalRecordID, CrimeDTO criminalRecord);
 
         Task AddCrimeToUser(Guid userId, CriminalRecord criminalRecord);
 

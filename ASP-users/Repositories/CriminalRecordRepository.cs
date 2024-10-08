@@ -1,5 +1,6 @@
 ﻿using ASP_users.Interfaces;
 using ASP_users.Models;
+using ASP_users.Models.DTO;
 using MySqlConnector;
 
 namespace ASP_users.Repositories
@@ -81,23 +82,23 @@ namespace ASP_users.Repositories
 
             var command = CreateCommand(
                 @"SELECT 
-                    criminalrecords.CriminalRecordID,
-                    criminalrecords.UserID,
-                    criminalrecords.Article,
-                    criminalrecords.ConvictionDate,
-                    criminalrecords.ReleaseDate,
-                    criminalrecords.Sentence,
-                    criminalrecords.CaseDetailsURL,
-                    criminalrecords.Details,
-                    prisons.PrisonID,
-                    prisons.PrisonName,
-                    prisons.Location,
-                    prisons.Capacity,
-                    prisons.SecurityLevel
-                  FROM 
-                    criminalrecords LEFT JOIN prisons ON criminalrecords.PrisonID = prisons.PrisonID
-                  WHERE 
-                    criminalrecords.CriminalRecordID = @CriminalRecordID;"
+            criminalrecords.CriminalRecordID,
+            criminalrecords.UserID,
+            criminalrecords.Article,
+            criminalrecords.ConvictionDate,
+            criminalrecords.ReleaseDate,
+            criminalrecords.Sentence,
+            criminalrecords.CaseDetailsURL,
+            criminalrecords.Details,
+            prisons.PrisonID,
+            prisons.PrisonName,
+            prisons.Location,
+            prisons.Capacity,
+            prisons.SecurityLevel
+          FROM 
+            criminalrecords LEFT JOIN prisons ON criminalrecords.PrisonID = prisons.PrisonID
+          WHERE 
+            criminalrecords.CriminalRecordID = @CriminalRecordID;"
             );
 
             command.Parameters.AddWithValue("@CriminalRecordID", criminalRecordId);
@@ -128,13 +129,25 @@ namespace ASP_users.Repositories
                     }
                 };
             }
+
             _connection.Close();
+
+            if (criminalRecord != null)
+            {
+                // Добавьте логирование для проверки, что данные были найдены
+                Console.WriteLine($"Criminal Record Found: {criminalRecord.Article}");
+            }
+            else
+            {
+                Console.WriteLine("Criminal Record Not Found");
+            }
 
             return criminalRecord;
         }
 
 
-        public async Task UpdateCriminalRecord(int criminalRecordId, CriminalRecord criminalRecord)
+
+        public async Task UpdateCriminalRecord(int criminalRecordId, CrimeDTO criminalRecord)
         {
             var command = CreateCommand(
                 @"UPDATE 
@@ -160,7 +173,7 @@ namespace ASP_users.Repositories
             command.Parameters.AddWithValue("@Sentence", criminalRecord.Sentence);
             command.Parameters.AddWithValue("@CaseDetailsURL", criminalRecord.CaseDetailsURL);
             command.Parameters.AddWithValue("@Details", criminalRecord.Details);
-            command.Parameters.AddWithValue("@PrisonID", criminalRecord.Prison.PrisonID);
+            command.Parameters.AddWithValue("@PrisonID", criminalRecord.PrisonID);
 
             _connection.Open();
 

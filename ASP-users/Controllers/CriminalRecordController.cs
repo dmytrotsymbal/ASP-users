@@ -1,5 +1,6 @@
 ﻿using ASP_users.Interfaces;
 using ASP_users.Models;
+using ASP_users.Models.DTO;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ASP_users.Controllers
@@ -59,7 +60,7 @@ namespace ASP_users.Controllers
 
 
         [HttpPut("update/{criminalRecordId}")]
-        public async Task<IActionResult> UpdateCriminalRecord(int criminalRecordId, [FromBody] CriminalRecord criminalRecord)
+        public async Task<IActionResult> UpdateCriminalRecord(int criminalRecordId, [FromBody] CrimeDTO criminalRecord)
         {
             try
             {
