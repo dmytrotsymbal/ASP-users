@@ -68,7 +68,7 @@ namespace ASP_users.Repositories
                         }
                     };
                     usersCrimes.Add(criminalRecord);
-                }   
+                }
             }
             _connection.Close();
 
@@ -78,27 +78,27 @@ namespace ASP_users.Repositories
 
         public async Task<CriminalRecord> GetCriminalRecordById(int criminalRecordId)
         {
-            CriminalRecord criminalRecord = null;
+            CriminalRecord? criminalRecord = null;
 
             var command = CreateCommand(
                 @"SELECT 
-            criminalrecords.CriminalRecordID,
-            criminalrecords.UserID,
-            criminalrecords.Article,
-            criminalrecords.ConvictionDate,
-            criminalrecords.ReleaseDate,
-            criminalrecords.Sentence,
-            criminalrecords.CaseDetailsURL,
-            criminalrecords.Details,
-            prisons.PrisonID,
-            prisons.PrisonName,
-            prisons.Location,
-            prisons.Capacity,
-            prisons.SecurityLevel
-          FROM 
-            criminalrecords LEFT JOIN prisons ON criminalrecords.PrisonID = prisons.PrisonID
-          WHERE 
-            criminalrecords.CriminalRecordID = @CriminalRecordID;"
+                    criminalrecords.CriminalRecordID,
+                    criminalrecords.UserID,
+                    criminalrecords.Article,
+                    criminalrecords.ConvictionDate,
+                    criminalrecords.ReleaseDate,
+                    criminalrecords.Sentence,
+                    criminalrecords.CaseDetailsURL,
+                    criminalrecords.Details,
+                    prisons.PrisonID,
+                    prisons.PrisonName,
+                    prisons.Location,
+                    prisons.Capacity,
+                    prisons.SecurityLevel
+                  FROM 
+                    criminalrecords LEFT JOIN prisons ON criminalrecords.PrisonID = prisons.PrisonID
+                  WHERE 
+                    criminalrecords.CriminalRecordID = @CriminalRecordID;"
             );
 
             command.Parameters.AddWithValue("@CriminalRecordID", criminalRecordId);
@@ -129,18 +129,7 @@ namespace ASP_users.Repositories
                     }
                 };
             }
-
             _connection.Close();
-
-            if (criminalRecord != null)
-            {
-                // Добавьте логирование для проверки, что данные были найдены
-                Console.WriteLine($"Criminal Record Found: {criminalRecord.Article}");
-            }
-            else
-            {
-                Console.WriteLine("Criminal Record Not Found");
-            }
 
             return criminalRecord;
         }
@@ -244,6 +233,46 @@ namespace ASP_users.Repositories
             await command.ExecuteNonQueryAsync();
 
             _connection.Close();
+        }
+
+
+
+        // HALPERS==========================================================
+
+        public async Task<IEnumerable<Prison>> GetAllPrisons()
+        {
+            var prisons = new List<Prison>();
+
+            var command = CreateCommand(
+                @"SELECT 
+                    PrisonID,
+                    PrisonName,
+                    Location,
+                    Capacity,
+                    SecurityLevel
+                  FROM 
+                    prisons;"
+            );
+
+            _connection.Open();
+
+            var reader = await command.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
+            {
+                var prison = new Prison
+                {
+                    PrisonID = reader.GetInt32(0),
+                    PrisonName = reader.GetString(1),
+                    Location = reader.GetString(2),
+                    Capacity = reader.GetInt32(3),
+                    SecurityLevel = Enum.Parse<Prison.SecurityLevelEnum>(reader.GetString(4))
+                };
+                prisons.Add(prison);
+            }
+            _connection.Close();
+
+            return prisons;
         }
     }
 }

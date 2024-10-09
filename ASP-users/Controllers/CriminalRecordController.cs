@@ -79,7 +79,7 @@ namespace ASP_users.Controllers
 
 
 
-        
+
         [HttpPost("add-crime-to/{userId}")]
         public async Task<IActionResult> AddCrimeToUser(Guid userId, [FromBody] CriminalRecord criminalRecord)
         {
@@ -110,6 +110,28 @@ namespace ASP_users.Controllers
             {
                 await _criminalRecordRepository.DeleteCriminalRecord(criminalRecordId);
                 return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+
+
+        // HALPERS==========================================================
+
+        [HttpGet("get-all-prisons")]
+        public async Task<IActionResult> GetAllPrisons()
+        {
+            try
+            {
+                var prisons = await _criminalRecordRepository.GetAllPrisons();
+                if (prisons == null)
+                {
+                    return NotFound("No prisons found.");
+                }
+                return Ok(prisons);
             }
             catch (Exception ex)
             {

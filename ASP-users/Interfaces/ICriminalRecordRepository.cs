@@ -14,5 +14,9 @@ namespace ASP_users.Interfaces
         Task AddCrimeToUser(Guid userId, CriminalRecord criminalRecord);
 
         Task DeleteCriminalRecord(int criminalRecordID);
+
+
+        // HALPERS
+        Task<IEnumerable<Prison>> GetAllPrisons();
     }
 }

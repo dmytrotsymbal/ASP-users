@@ -213,8 +213,8 @@ namespace ASP_users.Repositories
                     };
                     searchedCars.Add(car);
                 }
-            } 
-            
+            }
+
             _connection.Close();
 
             return searchedCars;
