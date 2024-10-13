@@ -304,8 +304,6 @@ namespace ASP_users.Repositories
 
 
 
-
-        // ========================================================================================================
         // HELPERS
 
         public async Task<User> GetUserByEmail(string email)

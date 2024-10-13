@@ -12,7 +12,7 @@ namespace ASP_users.Repositories
             _connection = connection;
         }
 
-        // Метод для створення команди SQL з параметрами
+        // Метод для створення команди SQL з параметрами ( використовується в кожному репозиторію для створення запиту до БД )
         protected MySqlCommand CreateCommand(string query, params MySqlParameter[] parameters)
         {
             var command = new MySqlCommand(query, _connection);

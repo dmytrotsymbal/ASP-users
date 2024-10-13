@@ -19,16 +19,30 @@ namespace ASP_users.Controllers
         [HttpPost("{userId}")]
         public async Task<IActionResult> AddPhoto(Guid userId, [FromBody] Photo photo)
         {
-            await _photoRepository.AddPhoto(userId, photo);
-            return Ok();
+            try
+            {
+                await _photoRepository.AddPhoto(userId, photo);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
 
         [HttpDelete("{imageID}")]
         public async Task<IActionResult> DeletePhoto(int imageID)
         {
-            await _photoRepository.DeletePhoto(imageID);
-            return NoContent();
+            try
+            {
+                await _photoRepository.DeletePhoto(imageID);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }
