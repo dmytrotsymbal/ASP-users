@@ -46,5 +46,45 @@ namespace ASP_users.Repositories
             _connection.Close();
             return usersPhones;
         }
+
+
+        public async Task<Phone> GetPhoneById(int phoneId)
+        {
+            Phone phone = null;
+
+            var command = CreateCommand(
+                @"SELECT 
+                    PhoneID,
+                    UserID,
+                    PhoneNumber
+                FROM 
+                    Phones
+                WHERE 
+                    PhoneID = @PhoneID"
+            );
+
+            command.Parameters.AddWithValue("@PhoneID", phoneId);
+
+            _connection.Open();
+
+            var reader = await command.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
+            {
+                phone = new Phone
+                {
+                    PhoneID = reader.GetInt32(0),
+                    UserID = reader.GetGuid(1),
+                    PhoneNumber = reader.GetString(2),
+                };
+            }
+
+            _connection.Close();
+
+            return phone;
+        }
+
+
+
     }
 }

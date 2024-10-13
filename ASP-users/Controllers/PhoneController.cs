@@ -1,6 +1,4 @@
 ﻿using ASP_users.Interfaces;
-using ASP_users.Models;
-using ASP_users.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ASP_users.Controllers
@@ -16,15 +14,41 @@ namespace ASP_users.Controllers
             _phoneRepository = phoneRepository;
         }
 
-        [HttpGet("GetAllUsersPhones/{userId}")]
+        [HttpGet("get-all-users-phones/{userId}")]
         public async Task<IActionResult> GetAllUsersPhones(Guid userId)
         {
-            var usersPhones = await _phoneRepository.GetAllUsersPhones(userId);
-            if (usersPhones == null)
+            try
             {
-                return NotFound();
+                var usersPhones = await _phoneRepository.GetAllUsersPhones(userId);
+                if (usersPhones == null)
+                {
+                    return NotFound();
+                }
+                return Ok(usersPhones);
             }
-            return Ok(usersPhones);
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+
+        [HttpGet("get-phone-by-id/{phoneId}")]
+        public async Task<IActionResult> GetPhoneById(int phoneId)
+        {
+            try
+            {
+                var phone = await _phoneRepository.GetPhoneById(phoneId);
+                if (phone == null)
+                {
+                    return NotFound();
+                }
+                return Ok(phone);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }
