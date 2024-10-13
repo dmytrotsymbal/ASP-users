@@ -9,5 +9,9 @@ namespace ASP_users.Interfaces
         Task<Phone> GetPhoneById(int phoneId);
 
         Task UpdatePhone(int phoneId, Phone phone);
+
+        Task AddPhoneToUser(Guid userId, Phone phone);
+
+        Task DeletePhone(int phoneId);
     }
 }

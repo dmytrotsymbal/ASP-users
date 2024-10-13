@@ -85,6 +85,64 @@ namespace ASP_users.Repositories
         }
 
 
+        public async Task UpdatePhone(int phoneId, Phone phone)
+        {
+            var command = CreateCommand(
+                @"UPDATE 
+                    Phones
+                  SET 
+                    PhoneNumber = @PhoneNumber
+                  WHERE 
+                    PhoneID = @PhoneID"
+            );
 
+            command.Parameters.AddWithValue("@PhoneNumber", phone.PhoneNumber);
+            command.Parameters.AddWithValue("@PhoneID", phoneId);
+
+            _connection.Open();
+
+            await command.ExecuteNonQueryAsync();
+
+            _connection.Close();
+        }
+
+
+        public async Task AddPhoneToUser(Guid userId, Phone phone)
+        {
+            var command = CreateCommand(
+                @"INSERT INTO 
+                    Phones (UserID, PhoneNumber)
+                  VALUES 
+                    (@UserID, @PhoneNumber)"
+            );
+
+            command.Parameters.AddWithValue("@UserID", userId);
+            command.Parameters.AddWithValue("@PhoneNumber", phone.PhoneNumber);
+
+            _connection.Open();
+
+            await command.ExecuteNonQueryAsync();
+
+            _connection.Close();
+        }
+
+
+        public async Task DeletePhone(int phoneId)
+        {
+            var command = CreateCommand(
+                @"DELETE FROM 
+                    Phones
+                  WHERE 
+                    PhoneID = @PhoneID"
+            );
+
+            command.Parameters.AddWithValue("@PhoneID", phoneId);
+
+            _connection.Open();
+
+            await command.ExecuteNonQueryAsync();
+
+            _connection.Close();
+        }
     }
 }
