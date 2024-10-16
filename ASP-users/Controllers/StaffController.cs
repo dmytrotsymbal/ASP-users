@@ -33,7 +33,9 @@ namespace ASP_users.Controllers
             return Ok(new
             {
                 staffAccount.Nickname,
-                staffAccount.Role
+                staffAccount.Role,
+                staffAccount.CreatedAt,
+                staffAccount.Email
             });
         }
     }
