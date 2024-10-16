@@ -4,8 +4,8 @@ using MySqlConnector;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers() 
-    .AddJsonOptions(options => 
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
     {
         // доданий конвертер автоматично перетворюватиме всі enum у їхні текстові значення 
         options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
@@ -24,6 +24,7 @@ builder.Services.AddScoped<IPhoneRepository, PhoneRepository>();
 builder.Services.AddScoped<ICarRepository, CarRepository>();
 builder.Services.AddScoped<IAddressRepository, UserAddressRepository>();
 builder.Services.AddScoped<ICriminalRecordRepository, CriminalRecordRepository>();
+builder.Services.AddScoped<IStaffRepository, StaffRepository>();
 
 
 var app = builder.Build();
