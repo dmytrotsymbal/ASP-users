@@ -1,6 +1,11 @@
 ﻿using ASP_users.Interfaces;
+using ASP_users.Models;
 using ASP_users.Models.DTO;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace ASP_users.Controllers
 {
@@ -9,11 +14,14 @@ namespace ASP_users.Controllers
     public class StaffController : ControllerBase
     {
         private readonly IStaffRepository _staffRepository;
+        private readonly IConfiguration _config; // Добавляем IConfiguration
 
-        public StaffController(IStaffRepository staffRepository)
+        public StaffController(IStaffRepository staffRepository, IConfiguration config)
         {
             _staffRepository = staffRepository;
+            _config = config; // Внедряем IConfiguration через DI
         }
+
 
 
         [HttpPost("login")]
@@ -24,19 +32,46 @@ namespace ASP_users.Controllers
             if (staffAccount == null)
                 return Unauthorized("Invalid email or password.");
 
-            // Проверка пароля
+            // Перевірка пароля
             bool isValidPassword = BCrypt.Net.BCrypt.Verify(loginDto.Password, staffAccount.PasswordHash);
             if (!isValidPassword)
                 return Unauthorized("Invalid email or password.");
 
-            // Если логин успешен, возвращаем информацию о роли
+            // Генерація JWT токена
+            var token = GenerateJwtToken(staffAccount);
+
+            // Повернення токена клієнту
             return Ok(new
             {
+                Token = token, // Повертаємо токен
                 staffAccount.Nickname,
                 staffAccount.Role,
                 staffAccount.CreatedAt,
                 staffAccount.Email
             });
         }
+
+        private string GenerateJwtToken(StaffAccount staffAccount)
+        {
+            var claims = new[]
+            {
+            new Claim(ClaimTypes.NameIdentifier, staffAccount.StaffID.ToString()),
+            new Claim(ClaimTypes.Email, staffAccount.Email),
+            new Claim(ClaimTypes.Role, staffAccount.Role.ToString())
+            };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(
+                issuer: _config["Jwt:Issuer"],
+                audience: _config["Jwt:Audience"],
+                claims: claims,
+                expires: DateTime.Now.AddHours(1),
+                signingCredentials: creds);
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
     }
 }
