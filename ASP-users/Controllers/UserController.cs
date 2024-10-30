@@ -1,6 +1,7 @@
 ﻿using ASP_users.Interfaces;
 using ASP_users.Models;
 using ASP_users.Models.DTO;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ASP_users.Controllers
@@ -18,6 +19,7 @@ namespace ASP_users.Controllers
 
 
         [HttpGet]
+        [Authorize(Roles = "admin, moderator, visitor")]
         public async Task<IActionResult> GetAllUsers(int pageNumber = 1, int pageSize = 10)
         {
             try
@@ -32,8 +34,8 @@ namespace ASP_users.Controllers
         }
 
 
-
         [HttpGet("{userId}")]
+        [Authorize(Roles = "admin, moderator, visitor")]
         public async Task<IActionResult> GetUserById(Guid userId)
         {
             try
@@ -54,6 +56,7 @@ namespace ASP_users.Controllers
 
 
         [HttpGet("search")]
+        [Authorize(Roles = "admin, moderator, visitor")]
         public async Task<IActionResult> SearchUser(string searchQuery)
         {
             try
@@ -74,6 +77,7 @@ namespace ASP_users.Controllers
 
 
         [HttpPost]
+        [Authorize(Roles = "admin, moderator")]
         public async Task<IActionResult> CreateUser(UserDTO userDto)
         {
             try
@@ -93,8 +97,8 @@ namespace ASP_users.Controllers
                     CreatedAt = DateTime.Now   // генерується автоматично
                 };
 
-                await _userRepository.CreateUser(createdUser); 
-                return CreatedAtAction(nameof(GetAllUsers), new { id = createdUser.UserID }, createdUser.UserID); 
+                await _userRepository.CreateUser(createdUser);
+                return CreatedAtAction(nameof(GetAllUsers), new { id = createdUser.UserID }, createdUser.UserID);
             }
             catch (Exception ex)
             {
@@ -106,6 +110,7 @@ namespace ASP_users.Controllers
 
 
         [HttpPut("{userId}")]
+        [Authorize(Roles = "admin, moderator")]
         public async Task<IActionResult> UpdateUser(Guid userId, [FromBody] User user)
         {
             try
@@ -127,6 +132,7 @@ namespace ASP_users.Controllers
 
 
         [HttpDelete("{userId}")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> DeleteUser(Guid userId)
         {
             try
@@ -147,6 +153,7 @@ namespace ASP_users.Controllers
         // HELPERS
 
         [HttpGet("check-email")]
+        [Authorize(Roles = "admin, moderator, visitor")]
         public async Task<IActionResult> CheckEmailExists(string email)
         {
             try
@@ -167,6 +174,7 @@ namespace ASP_users.Controllers
 
 
         [HttpGet("quantity")]
+        [Authorize(Roles = "admin, moderator, visitor")]
         public async Task<IActionResult> GetUsersCount()
         {
             try
@@ -183,6 +191,7 @@ namespace ASP_users.Controllers
 
 
         [HttpGet("get-all-ids")]
+        [Authorize(Roles = "admin, moderator, visitor")]
         public async Task<IActionResult> GetAllUsersIDs()
         {
             try

@@ -29,13 +29,21 @@ namespace ASP_users.Controllers
         {
             var staffAccount = await _staffRepository.GetStaffAccountByEmail(loginDto.Email);
 
+            // Перевірка користувача
             if (staffAccount == null)
-                return Unauthorized("Invalid email or password.");
+            {
+                return Unauthorized("Invalid email or password."); // Повертаємо помилку
+            }
 
-            // Перевірка пароля
+
+            // Перевірка пароля 
             bool isValidPassword = BCrypt.Net.BCrypt.Verify(loginDto.Password, staffAccount.PasswordHash);
+
             if (!isValidPassword)
+            {
                 return Unauthorized("Invalid email or password.");
+            }
+
 
             // Генерація JWT токена
             var token = GenerateJwtToken(staffAccount);
@@ -51,13 +59,16 @@ namespace ASP_users.Controllers
             });
         }
 
+
+
+        // HALPERS =========================================================================
         private string GenerateJwtToken(StaffAccount staffAccount)
         {
             var claims = new[]
             {
-            new Claim(ClaimTypes.NameIdentifier, staffAccount.StaffID.ToString()),
-            new Claim(ClaimTypes.Email, staffAccount.Email),
-            new Claim(ClaimTypes.Role, staffAccount.Role.ToString())
+                new Claim(ClaimTypes.NameIdentifier, staffAccount.StaffID.ToString()),
+                new Claim(ClaimTypes.Email, staffAccount.Email),
+                new Claim(ClaimTypes.Role, staffAccount.Role.ToString())
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
@@ -72,6 +83,5 @@ namespace ASP_users.Controllers
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
-
     }
 }

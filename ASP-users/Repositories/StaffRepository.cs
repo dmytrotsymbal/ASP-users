@@ -8,7 +8,8 @@ namespace ASP_users.Repositories
     {
         public StaffRepository(MySqlConnection connection) : base(connection) { }
 
-        // Поиск сотрудника по email
+
+
         public async Task<StaffAccount?> GetStaffAccountByEmail(string email)
         {
             StaffAccount? staffAccount = null;
