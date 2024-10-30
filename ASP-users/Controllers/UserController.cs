@@ -19,12 +19,12 @@ namespace ASP_users.Controllers
 
 
         [HttpGet]
-        [Authorize(Roles = "admin, moderator, visitor")]
-        public async Task<IActionResult> GetAllUsers(int pageNumber = 1, int pageSize = 10)
+        //[Authorize(Roles = "admin, moderator, visitor")]
+        public async Task<IActionResult> GetAllUsers(int pageNumber = 1, int pageSize = 10, string sortBy = "UserID", string sortDirection = "asc")
         {
             try
             {
-                var users = await _userRepository.GetAllUsers(pageNumber, pageSize);
+                var users = await _userRepository.GetAllUsers(pageNumber, pageSize, sortBy, sortDirection);
                 return Ok(users);
             }
             catch (Exception ex)

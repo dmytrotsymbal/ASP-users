@@ -4,7 +4,7 @@ namespace ASP_users.Interfaces
 {
     public interface IUserRepository
     {
-        Task<IEnumerable<User>> GetAllUsers(int pageNumber = 1, int pageSize = 10);
+        Task<IEnumerable<User>> GetAllUsers(int pageNumber = 1, int pageSize = 10, string sortBy = "UserID", string sortDirection = "asc");
         Task<User> GetUserById(Guid userId);
         Task<IEnumerable<User>> SearchUsers(string searchQuery);
         Task CreateUser(User user);

@@ -10,37 +10,66 @@ namespace ASP_users.Repositories
 
 
 
-        public async Task<IEnumerable<User>> GetAllUsers(int pageNumber = 1, int pageSize = 10)
+        public async Task<IEnumerable<User>> GetAllUsers(int pageNumber = 1, int pageSize = 10, string sortBy = "UserID", string sortDirection = "asc")
         {
 
-            var offset = (pageNumber - 1) * pageSize;
+            var offset = (pageNumber - 1) * pageSize; // змінна для пагінації
+
+            switch (sortBy) // світч для сортування по якому полю
+            {
+                case "FirstName":
+                    sortBy = "users.FirstName";
+                    break;
+                case "LastName":
+                    sortBy = "users.LastName";
+                    break;
+                case "DateOfBirth":
+                    sortBy = "users.DateOfBirth";
+                    break;
+                case "CreatedAt":
+                    sortBy = "users.CreatedAt";
+                    break;
+            }
+
+            switch (sortDirection) // світч для сортування в якому порядку
+            {
+                case "asc":
+                    sortDirection = "ASC";
+                    break;
+                case "desc":
+                    sortDirection = "DESC";
+                    break;
+            }
+
 
             var usersList = new List<User>(); // Створюємо список для зберігання користувачів
 
             var command = CreateCommand(
-                @"SELECT 
-                    users.UserID, 
-                    users.FirstName, 
-                    users.LastName, 
-                    users.Email, 
-                    users.DateOfBirth, 
-                    users.CreatedAt, 
-                    photos.ImageID,
-                    photos.ImageURL, 
-                    photos.AltText, 
-                    photos.UploadedAt 
-                 FROM 
-                    users LEFT JOIN photos ON users.UserID = photos.UserID 
-                 GROUP BY 
-                    users.UserID
-                 ORDER BY 
-                    users.UserID
-                 LIMIT @offset, @pageSize"
+                $@"SELECT 
+                   users.UserID, 
+                   users.FirstName, 
+                   users.LastName, 
+                   users.Email, 
+                   users.DateOfBirth, 
+                   users.CreatedAt, 
+                   photos.ImageID,
+                   photos.ImageURL, 
+                   photos.AltText, 
+                   photos.UploadedAt 
+               FROM 
+                   users LEFT JOIN photos ON users.UserID = photos.UserID 
+               GROUP BY 
+                   users.UserID
+               ORDER BY 
+                   {sortBy} {sortDirection} 
+               LIMIT @offset, @pageSize;"
             );
 
 
             command.Parameters.AddWithValue("@offset", offset);
             command.Parameters.AddWithValue("@pageSize", pageSize);
+            command.Parameters.AddWithValue("@sortBy", sortBy);
+            command.Parameters.AddWithValue("@sortDirection", sortDirection);
 
             _connection.Open(); // Відкриваємо з'єднання з базою даних
 
