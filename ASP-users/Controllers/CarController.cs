@@ -17,11 +17,11 @@ namespace ASP_users.Controllers
 
 
         [HttpGet("get-all-cars")]
-        public async Task<IActionResult> GetAllCars(int pageNumber, int pageSize)
+        public async Task<IActionResult> GetAllCars(int pageNumber, int pageSize, string sortBy, string sortDirection)
         {
             try
             {
-                var cars = await _carRepository.GetAllCars(pageNumber, pageSize);
+                var cars = await _carRepository.GetAllCars(pageNumber, pageSize, sortBy, sortDirection);
                 return Ok(cars);
             }
             catch (Exception ex)

@@ -8,14 +8,37 @@ namespace ASP_users.Repositories
     {
         public CarRepository(MySqlConnection connection) : base(connection) { }
 
-        public async Task<IEnumerable<Car>> GetAllCars(int pageNumber, int pageSize)
+        public async Task<IEnumerable<Car>> GetAllCars(int pageNumber, int pageSize, string sortBy, string sortDirection)
         {
             var offset = (pageNumber - 1) * pageSize;
+
+            switch (sortBy)
+            {
+                case "Firm":
+                    sortBy = "cars.Firm";
+                    break;
+                case "Model":
+                    sortBy = "cars.Model";
+                    break;
+                case "Year":
+                    sortBy = "cars.Year";
+                    break;
+            };
+
+            switch (sortDirection)
+            {
+                case "asc":
+                    sortDirection = "ASC";
+                    break;
+                case "desc":
+                    sortDirection = "DESC";
+                    break;
+            };
 
             var carsList = new List<Car>();
 
             var command = CreateCommand(
-                @"SELECT 
+                $@"SELECT 
 	                CarID,
 	                UserID,
 	                Firm,
@@ -26,11 +49,16 @@ namespace ASP_users.Repositories
 	                CarPhotoURL
                 FROM 
                     Cars
-                LIMIT @offset, @pageSize"
+                ORDER BY
+                    {sortBy} {sortDirection}
+                LIMIT 
+                    @offset, @pageSize"
             );
 
             command.Parameters.AddWithValue("@offset", offset);
             command.Parameters.AddWithValue("@pageSize", pageSize);
+            command.Parameters.AddWithValue("@sortBy", sortBy);
+            command.Parameters.AddWithValue("@sortDirection", sortDirection);
 
             _connection.Open();
 

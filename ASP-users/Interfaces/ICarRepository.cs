@@ -4,7 +4,7 @@ namespace ASP_users.Interfaces
 {
     public interface ICarRepository
     {
-        Task<IEnumerable<Car>> GetAllCars(int pageNumber, int pageSize);
+        Task<IEnumerable<Car>> GetAllCars(int pageNumber, int pageSize, string sortBy, string sortDirection);
 
         Task<Car> GetCarById(int carId);
 

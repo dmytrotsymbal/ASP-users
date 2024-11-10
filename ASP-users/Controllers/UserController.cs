@@ -19,7 +19,7 @@ namespace ASP_users.Controllers
 
 
         [HttpGet]
-        //[Authorize(Roles = "admin, moderator, visitor")]
+        [Authorize(Roles = "admin, moderator, visitor")]
         public async Task<IActionResult> GetAllUsers(int pageNumber = 1, int pageSize = 10, string sortBy = "UserID", string sortDirection = "asc")
         {
             try
