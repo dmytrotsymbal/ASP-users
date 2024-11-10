@@ -1,5 +1,6 @@
 ﻿using ASP_users.Interfaces;
 using ASP_users.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ASP_users.Controllers
@@ -17,6 +18,7 @@ namespace ASP_users.Controllers
 
 
         [HttpGet("get-all-cars")]
+        [Authorize(Roles = "admin, moderator, visitor")]
         public async Task<IActionResult> GetAllCars(int pageNumber, int pageSize, string sortBy, string sortDirection)
         {
             try
@@ -32,6 +34,7 @@ namespace ASP_users.Controllers
 
 
         [HttpGet("get-by-id/{carId}")]
+        [Authorize(Roles = "admin, moderator, visitor")]
         public async Task<IActionResult> GetCarById(int carId)
         {
             try
@@ -51,6 +54,7 @@ namespace ASP_users.Controllers
 
 
         [HttpGet("get-all-users-cars/{userId}")]
+        [Authorize(Roles = "admin, moderator, visitor")]
         public async Task<IActionResult> GetAllUsersCars(Guid userId)
         {
             try
@@ -70,6 +74,7 @@ namespace ASP_users.Controllers
 
 
         [HttpGet("search-cars")]
+        [Authorize(Roles = "admin, moderator, visitor")]
         public async Task<IActionResult> SearchCars(string searchQuery)
         {
             try
@@ -89,6 +94,7 @@ namespace ASP_users.Controllers
 
 
         [HttpPut("update/{CarId}")]
+        [Authorize(Roles = "admin, moderator")]
         public async Task<IActionResult> UpdateCar(int carId, Car car)
         {
             try
@@ -108,6 +114,7 @@ namespace ASP_users.Controllers
 
 
         [HttpPost("add/{userId}")]
+        [Authorize(Roles = "admin, moderator")]
         public async Task<IActionResult> AddCarToUser(Guid userId, [FromBody] Car car)
         {
             try
@@ -129,6 +136,7 @@ namespace ASP_users.Controllers
 
 
         [HttpDelete("delete/{CarId}")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> DeleteCar(int CarId)
         {
             try
@@ -143,9 +151,9 @@ namespace ASP_users.Controllers
         }
 
 
-        // HALPERS
-
+        // HALPERS =========================================================================
         [HttpGet("quantity")]
+        [Authorize(Roles = "admin, moderator")]
         public async Task<IActionResult> GetCarsCount()
         {
             try
