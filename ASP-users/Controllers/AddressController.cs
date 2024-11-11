@@ -1,6 +1,7 @@
 ﻿using ASP_users.Interfaces;
 using ASP_users.Models;
 using ASP_users.Models.DTO;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ASP_users.Controllers
@@ -18,6 +19,7 @@ namespace ASP_users.Controllers
 
 
         [HttpGet("get-all/{userId}")]
+        [Authorize(Roles = "admin, moderator, visitor")]
         public async Task<IActionResult> GetUserAddresses(Guid userId)
         {
             try
@@ -28,8 +30,9 @@ namespace ASP_users.Controllers
                     return NotFound();
                 }
                 return Ok(usersAddresses);
-            } 
-            catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 return BadRequest(ex);
             }
         }
@@ -38,6 +41,7 @@ namespace ASP_users.Controllers
 
         // ЮРЛ для получения адреса по ID без указания юзера (для отдельной страницы)
         [HttpGet("get-by-id/{addressId}")]
+        [Authorize(Roles = "admin, moderator, visitor")]
         public async Task<IActionResult> GetAddressById(int addressId)
         {
             try
@@ -57,6 +61,7 @@ namespace ASP_users.Controllers
 
         // ЮРЛ для получения адреса по ID в котором указіваться ID юзера (для форми редактирования)
         [HttpGet("get-by-id/{addressId}/for-user/{userId}")]
+        [Authorize(Roles = "admin, moderator, visitor")]
         public async Task<IActionResult> GetUserAddressById(Guid userId, int addressId)
         {
             try
@@ -79,6 +84,7 @@ namespace ASP_users.Controllers
 
 
         [HttpGet("get-living-history/{addressId}")]
+        [Authorize(Roles = "admin, moderator, visitor")]
         public async Task<IActionResult> GetAddressLivingHistory(int addressId)
         {
             try
@@ -89,8 +95,9 @@ namespace ASP_users.Controllers
                     return NotFound();
                 }
                 return Ok(addressLivingHistory);
-            } 
-            catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 return BadRequest(ex);
             }
         }
@@ -98,6 +105,7 @@ namespace ASP_users.Controllers
 
 
         [HttpPut("update/{addressId}")]
+        [Authorize(Roles = "admin, moderator")]
         public async Task UpdateAddress(int addressId, [FromBody] Address address)
         {
             try
@@ -107,8 +115,8 @@ namespace ASP_users.Controllers
                     throw new Exception("Address ID mismatch");
                 }
                 await _userAddressRepository.UpdateAddress(addressId, address);
-            } 
-            catch (Exception ex) 
+            }
+            catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
@@ -117,6 +125,7 @@ namespace ASP_users.Controllers
 
 
         [HttpPost("add/{userId}")]
+        [Authorize(Roles = "admin, moderator")]
         public async Task<IActionResult> AddAddressToUser(Guid userId, Address address)
         {
             try
@@ -135,6 +144,7 @@ namespace ASP_users.Controllers
 
 
         [HttpDelete("remove/{addressId}/from-user/{userId}")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> RemoveAddressFromUser(Guid userId, int addressId)
         {
             try
@@ -153,14 +163,15 @@ namespace ASP_users.Controllers
 
 
         [HttpPost("add-existing-user/{addressId}")]
+        [Authorize(Roles = "admin, moderator")]
         public async Task<IActionResult> AddExistingUserToLivingHistory(int addressId, [FromBody] AddressToUserDTO addressToUserDTO)
         {
             try
             {
                 await _userAddressRepository.AddExistingUserToLivingHistory(
-                    addressToUserDTO.UserID, 
-                    addressId, 
-                    addressToUserDTO.MoveInDate, 
+                    addressToUserDTO.UserID,
+                    addressId,
+                    addressToUserDTO.MoveInDate,
                     addressToUserDTO.MoveOutDate);
                 return Ok();
             }
@@ -174,7 +185,7 @@ namespace ASP_users.Controllers
 
 
         [HttpDelete("total-delete/{addressId}")]
-
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> TotalDeleteAddress(int addressId)
         {
             try
