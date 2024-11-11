@@ -153,7 +153,6 @@ namespace ASP_users.Controllers
         // HELPERS
 
         [HttpGet("check-email")]
-        [Authorize(Roles = "admin, moderator, visitor")]
         public async Task<IActionResult> CheckEmailExists(string email)
         {
             try

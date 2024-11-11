@@ -153,7 +153,7 @@ namespace ASP_users.Controllers
 
         // HALPERS =========================================================================
         [HttpGet("quantity")]
-        [Authorize(Roles = "admin, moderator")]
+        [Authorize(Roles = "admin, moderator, visitor")]
         public async Task<IActionResult> GetCarsCount()
         {
             try

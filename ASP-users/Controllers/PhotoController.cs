@@ -1,5 +1,6 @@
 ﻿using ASP_users.Interfaces;
 using ASP_users.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ASP_users.Controllers
@@ -17,6 +18,7 @@ namespace ASP_users.Controllers
         }
 
         [HttpPost("{userId}")]
+        [Authorize(Roles = "admin, moderator")]
         public async Task<IActionResult> AddPhoto(Guid userId, [FromBody] Photo photo)
         {
             try
@@ -32,6 +34,7 @@ namespace ASP_users.Controllers
 
 
         [HttpDelete("{imageID}")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> DeletePhoto(int imageID)
         {
             try
