@@ -1,2 +1,2 @@
 ## DB scheme 👀
-![DB_scheme](https://github.com/user-attachments/assets/fccb34e5-2d53-4ca3-b5cb-b903fc98b7bf)
+![DB_scheme](https://github.com/user-attachments/assets/c90d5190-649d-4a91-a928-4e09f3841bb8)
