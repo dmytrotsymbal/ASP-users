@@ -1,6 +1,7 @@
 ﻿using ASP_users.Interfaces;
 using ASP_users.Models;
 using ASP_users.Models.DTO;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ASP_users.Controllers
@@ -18,6 +19,7 @@ namespace ASP_users.Controllers
 
 
         [HttpGet("get-all-users-crimes/{userId}")]
+        [Authorize(Roles = "admin, moderator, visitor")]
         public async Task<IActionResult> GetAllUsersCriminalRecords(Guid userId)
         {
             try
@@ -39,6 +41,7 @@ namespace ASP_users.Controllers
 
 
         [HttpGet("get-crime-by-id/{criminalRecordId}")]
+        [Authorize(Roles = "admin, moderator, visitor")]
         public async Task<IActionResult> GetCriminalRecordById(int criminalRecordId)
         {
             try
@@ -60,6 +63,7 @@ namespace ASP_users.Controllers
 
 
         [HttpPut("update/{criminalRecordId}")]
+        [Authorize(Roles = "admin, moderator")]
         public async Task<IActionResult> UpdateCriminalRecord(int criminalRecordId, [FromBody] CrimeDTO criminalRecord)
         {
             try
@@ -81,6 +85,7 @@ namespace ASP_users.Controllers
 
 
         [HttpPost("add-crime-to/{userId}")]
+        [Authorize(Roles = "admin, moderator")]
         public async Task<IActionResult> AddCrimeToUser(Guid userId, [FromBody] CriminalRecord criminalRecord)
         {
             try
@@ -104,6 +109,7 @@ namespace ASP_users.Controllers
 
 
         [HttpDelete("delete/{criminalRecordId}")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> DeleteCriminalRecord(int criminalRecordId)
         {
             try
@@ -122,6 +128,7 @@ namespace ASP_users.Controllers
         // HALPERS==========================================================
 
         [HttpGet("get-all-prisons")]
+        [Authorize(Roles = "admin, moderator, visitor")]
         public async Task<IActionResult> GetAllPrisons()
         {
             try
