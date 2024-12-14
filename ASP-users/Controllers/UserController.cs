@@ -157,7 +157,7 @@ namespace ASP_users.Controllers
         {
             try
             {
-                var user = await _userRepository.GetUserByEmail(email); // викликаємо метод для пошуку користувача по email
+                var user = await _userRepository.CheckEmailExists(email); // викликаємо метод для пошуку користувача по email
                 if (user != null) // якщо користувач знайдений
                 {
                     return Conflict(new { message = "Такий Email вже існує" }); // повертаємо конфлікт з повідомленням

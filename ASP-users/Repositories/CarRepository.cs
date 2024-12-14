@@ -338,5 +338,54 @@ namespace ASP_users.Repositories
 
             return carsCount;
         }
+
+
+        public async Task<Car> CheckLicensePlateExist(string licensePlate)
+        {
+            Car car = null;
+
+            var command = CreateCommand(
+                @"SELECT 
+                    CarID,
+                    UserID,
+                    Firm,
+                    Model, 
+                    Color,
+                    Year,
+                    LicensePlate,
+                    CarPhotoURL
+                FROM 
+                    Cars
+                WHERE 
+                    LicensePlate = @LicensePlate"
+            );
+
+            command.Parameters.AddWithValue("@LicensePlate", licensePlate);
+
+            _connection.Open();
+
+            var reader = await command.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
+            {
+                if (car == null)
+                {
+                    car = new Car
+                    {
+                        CarID = reader.GetInt32(0),
+                        UserID = reader.GetGuid(1),
+                        Firm = reader.GetString(2),
+                        Model = reader.GetString(3),
+                        Color = reader.GetString(4),
+                        Year = reader.GetInt32(5),
+                        LicensePlate = reader.GetString(6),
+                        CarPhotoURL = reader.IsDBNull(7) ? null : reader.GetString(7)
+                    };
+                }
+            }
+            _connection.Close();
+
+            return car;
+        }
     }
 }

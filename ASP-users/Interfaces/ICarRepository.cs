@@ -21,5 +21,7 @@ namespace ASP_users.Interfaces
 
         // HALPERS
         Task<int> GetCarsCount();
+
+        Task<Car> CheckLicensePlateExist(string licensePlate);
     }
 }

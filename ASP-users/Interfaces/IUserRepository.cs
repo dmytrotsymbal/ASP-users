@@ -14,7 +14,7 @@ namespace ASP_users.Interfaces
 
 
         // HELPERS
-        Task<User> GetUserByEmail(string email);
+        Task<User> CheckEmailExists(string email);
 
         Task<int> GetUsersCount();
 

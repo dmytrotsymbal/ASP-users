@@ -166,5 +166,25 @@ namespace ASP_users.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+
+
+        [HttpGet("check-licensePlate")]
+        public async Task<IActionResult> CheckLicensePlate(string licensePlate)
+        {
+            try
+            {
+                var car = await _carRepository.CheckLicensePlateExist(licensePlate);
+                if (car != null)
+                {
+                    return Conflict(new { message = "Машина з таким номером вже існує" });
+                }
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

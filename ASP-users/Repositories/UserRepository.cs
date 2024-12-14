@@ -8,8 +8,6 @@ namespace ASP_users.Repositories
     {
         public UserRepository(MySqlConnection connection) : base(connection) { }
 
-
-
         public async Task<IEnumerable<User>> GetAllUsers(int pageNumber = 1, int pageSize = 10, string sortBy = "UserID", string sortDirection = "asc")
         {
 
@@ -335,7 +333,7 @@ namespace ASP_users.Repositories
 
         // HELPERS
 
-        public async Task<User> GetUserByEmail(string email)
+        public async Task<User> CheckEmailExists(string email)
         {
             User user = null;
 
