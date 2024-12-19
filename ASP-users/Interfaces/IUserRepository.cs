@@ -6,7 +6,13 @@ namespace ASP_users.Interfaces
     {
         Task<IEnumerable<User>> GetAllUsers(int pageNumber = 1, int pageSize = 10, string sortBy = "UserID", string sortDirection = "asc");
         Task<User> GetUserById(Guid userId);
-        Task<IEnumerable<User>> SearchUsers(string searchQuery);
+        Task<IEnumerable<User>> SearchUsers(
+            string? searchQuery,
+            int? minAge,
+            int? maxAge,
+            DateTime? createdFrom,
+            DateTime? createdTo,
+            bool? onlyAdults);
         Task CreateUser(User user);
         Task UpdateUser(Guid userId, User user);
         Task DeleteUser(Guid userId);

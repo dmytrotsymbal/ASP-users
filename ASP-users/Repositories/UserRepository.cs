@@ -174,11 +174,17 @@ namespace ASP_users.Repositories
         }
 
 
-        public async Task<IEnumerable<User>> SearchUsers(string searchQuery)
+        public async Task<IEnumerable<User>> SearchUsers(
+            string? searchQuery,
+            int? minAge,
+            int? maxAge,
+            DateTime? createdFrom,
+            DateTime? createdTo,
+            bool? onlyAdults)
         {
-            var searchedUsers = new List<User>(); // Створюємо список для зберігання користувачів
+            var searchedUsers = new List<User>();
 
-            var command = CreateCommand( // Створюємо SQL-запит для пошуку користувачів за ім'ям та прізвищем
+            var command = CreateCommand(
                 @"SELECT 
                     users.UserID, 
                     users.FirstName, 
@@ -193,42 +199,52 @@ namespace ASP_users.Repositories
                  FROM 
                     users LEFT JOIN photos ON users.UserID = photos.UserID 
                  WHERE 
-                    users.FirstName LIKE @SearchQuery OR users.LastName LIKE @SearchQuery OR users.UserID LIKE @SearchQuery
+                    (@SearchQuery IS NULL OR users.FirstName LIKE @SearchQuery OR users.LastName LIKE @SearchQuery OR users.UserID LIKE @SearchQuery)
+                    AND (@MinAge IS NULL OR YEAR(CURDATE()) - YEAR(users.DateOfBirth) >= @MinAge)
+                    AND (@MaxAge IS NULL OR YEAR(CURDATE()) - YEAR(users.DateOfBirth) <= @MaxAge)
+                    AND (@CreatedFrom IS NULL OR users.CreatedAt >= @CreatedFrom)
+                    AND (@CreatedTo IS NULL OR users.CreatedAt <= @CreatedTo)
+                    AND (@OnlyAdults IS NULL OR @OnlyAdults = false OR TIMESTAMPDIFF(YEAR, users.DateOfBirth, CURDATE()) >= 18)
                  ORDER BY 
                     users.UserID"
             );
 
-            command.Parameters.AddWithValue("@SearchQuery", $"%{searchQuery}%"); // Додаємо параметр @SearchQuery
+            command.Parameters.AddWithValue("@SearchQuery", string.IsNullOrEmpty(searchQuery) ? DBNull.Value : $"%{searchQuery}%");
+            command.Parameters.AddWithValue("@MinAge", minAge ?? (object)DBNull.Value);
+            command.Parameters.AddWithValue("@MaxAge", maxAge ?? (object)DBNull.Value);
+            command.Parameters.AddWithValue("@CreatedFrom", createdFrom ?? (object)DBNull.Value);
+            command.Parameters.AddWithValue("@CreatedTo", createdTo ?? (object)DBNull.Value);
+            command.Parameters.AddWithValue("@OnlyAdults", onlyAdults ?? (object)DBNull.Value);
 
-            _connection.Open(); // Відкриваємо з'єднання з базою даних
+            _connection.Open();
 
-            using var reader = await command.ExecuteReaderAsync(); // Виконуємо команду та отримуємо читач даних (DataReader)
+            using var reader = await command.ExecuteReaderAsync();
 
-            while (await reader.ReadAsync()) // Читаємо дані з результуючого набору
+            while (await reader.ReadAsync())
             {
-                var userId = reader.GetGuid(0); // Отримуємо UserID з першої колонки
+                var userId = reader.GetGuid(0);
 
-                var user = searchedUsers.FirstOrDefault(u => u.UserID == userId);  // FirstOrDefault для перевірки, чи існує користувач з певним UserID у списку.
+                var user = searchedUsers.FirstOrDefault(u => u.UserID == userId);
 
-                if (user == null) // Якщо користувача не знайдено
+                if (user == null)
                 {
-                    user = new User // Створюємо нового користувача
+                    user = new User
                     {
-                        UserID = userId, // Встановлюємо UserID
-                        FirstName = reader.GetString(1), // Встановлю
+                        UserID = userId,
+                        FirstName = reader.GetString(1),
                         LastName = reader.GetString(2),
                         Email = reader.GetString(3),
                         DateOfBirth = reader.GetDateTime(4),
                         CreatedAt = reader.GetDateTime(5),
-                        Photos = new List<Photo>() // Ініціалізуємо список Photos
+                        Photos = new List<Photo>()
                     };
 
-                    searchedUsers.Add(user); // Додаємо тільки що створеного користувача до списку
+                    searchedUsers.Add(user);
                 }
 
-                if (!reader.IsDBNull(6)) // Якщо у користувача є фото
+                if (!reader.IsDBNull(6))
                 {
-                    user.Photos.Add(new Photo // Додаємо фото до списку Photos користувача який ініціалізували попередньо
+                    user.Photos.Add(new Photo
                     {
                         ImageID = reader.GetInt32(6),
                         UserID = reader.GetGuid(0),
@@ -238,8 +254,8 @@ namespace ASP_users.Repositories
                     });
                 }
             }
-            _connection.Close(); // Закриваємо з'єднання з базою даних
-            return searchedUsers; // Повертаємо список користувачів з фото
+            _connection.Close();
+            return searchedUsers;
         }
 
 
