@@ -10,7 +10,11 @@ namespace ASP_users.Interfaces
 
         Task<IEnumerable<Car>> GetAllUsersCars(Guid userId);
 
-        Task<IEnumerable<Car>> SearchCars(string searchQuery);
+        Task<IEnumerable<Car>> SearchCars(
+            string? searchQuery,
+            int? minYear,
+            int? maxYear,
+            string? carColor);
 
         Task UpdateCar(int carId, Car car);
 

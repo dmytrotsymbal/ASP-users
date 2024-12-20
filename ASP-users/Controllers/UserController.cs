@@ -55,7 +55,7 @@ namespace ASP_users.Controllers
 
 
 
-        [HttpGet("search")]
+        [HttpGet("search-users")]
         [Authorize(Roles = "admin, moderator, visitor")]
         public async Task<IActionResult> SearchUser(
             [FromQuery] string? searchQuery,
@@ -67,12 +67,12 @@ namespace ASP_users.Controllers
         {
             try
             {
-                var users = await _userRepository.SearchUsers(searchQuery, minAge, maxAge, createdFrom, createdTo, onlyAdults);
-                if (!users.Any())
+                var searchedUsers = await _userRepository.SearchUsers(searchQuery, minAge, maxAge, createdFrom, createdTo, onlyAdults);
+                if (!searchedUsers.Any())
                 {
-                    return NotFound("Користувачі не знайдені");
+                    return NotFound("Користувачів за вишим запитом не знайдено");
                 }
-                return Ok(users);
+                return Ok(searchedUsers);
             }
             catch (Exception ex)
             {

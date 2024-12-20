@@ -75,16 +75,20 @@ namespace ASP_users.Controllers
 
         [HttpGet("search-cars")]
         [Authorize(Roles = "admin, moderator, visitor")]
-        public async Task<IActionResult> SearchCars(string searchQuery)
+        public async Task<IActionResult> SearchCars(
+            [FromQuery] string? searchQuery,
+            [FromQuery] int? minYear,
+            [FromQuery] int? maxYear,
+            [FromQuery] string? carColor)
         {
             try
             {
-                var cars = await _carRepository.SearchCars(searchQuery);
-                if (cars == null)
+                var searchedCars = await _carRepository.SearchCars(searchQuery, minYear, maxYear, carColor);
+                if (!searchedCars.Any())
                 {
-                    return NotFound();
+                    return NotFound("Машин за вашим запитом не знайдено");
                 }
-                return Ok(cars);
+                return Ok(searchedCars);
             }
             catch (Exception ex)
             {

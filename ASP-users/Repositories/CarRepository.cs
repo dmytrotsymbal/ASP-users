@@ -194,7 +194,11 @@ namespace ASP_users.Repositories
             return usersCars;
         }
 
-        public async Task<IEnumerable<Car>> SearchCars(string searchQuery)
+        public async Task<IEnumerable<Car>> SearchCars(
+            string? searchQuery,
+            int? minYear,
+            int? maxYear,
+            string? carColor)
         {
             var searchedCars = new List<Car>();
 
@@ -211,10 +215,18 @@ namespace ASP_users.Repositories
                 FROM
                     Cars
                 WHERE
-                    Firm LIKE @searchQuery OR LicensePlate LIKE @searchQuery"
+                    (@searchQuery IS NULL OR Firm LIKE @searchQuery OR Model LIKE @searchQuery OR LicensePlate LIKE @searchQuery)
+                    AND (@minYear IS NULL OR Year >= @minYear)
+                    AND (@maxYear IS NULL OR Year <= @maxYear)
+                    AND (@carColor IS NULL OR Color LIKE @carColor)
+                ORDER BY 
+                    CarID"
             );
 
-            command.Parameters.AddWithValue("@searchQuery", $"%{searchQuery}%");
+            command.Parameters.AddWithValue("@searchQuery", string.IsNullOrEmpty(searchQuery) ? DBNull.Value : $"%{searchQuery}%");
+            command.Parameters.AddWithValue("@MinYear", minYear ?? (object)DBNull.Value);
+            command.Parameters.AddWithValue("@MaxYear", maxYear ?? (object)DBNull.Value);
+            command.Parameters.AddWithValue("@CarColor", carColor ?? (object)DBNull.Value);
 
             _connection.Open();
 
@@ -242,7 +254,6 @@ namespace ASP_users.Repositories
                     searchedCars.Add(car);
                 }
             }
-
             _connection.Close();
 
             return searchedCars;
