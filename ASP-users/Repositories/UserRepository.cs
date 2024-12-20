@@ -180,7 +180,8 @@ namespace ASP_users.Repositories
             int? maxAge,
             DateTime? createdFrom,
             DateTime? createdTo,
-            bool? onlyAdults)
+            bool? onlyAdults,
+            bool? onlyWithPhoto)
         {
             var searchedUsers = new List<User>();
 
@@ -205,6 +206,7 @@ namespace ASP_users.Repositories
                     AND (@CreatedFrom IS NULL OR users.CreatedAt >= @CreatedFrom)
                     AND (@CreatedTo IS NULL OR users.CreatedAt <= @CreatedTo)
                     AND (@OnlyAdults IS NULL OR @OnlyAdults = false OR TIMESTAMPDIFF(YEAR, users.DateOfBirth, CURDATE()) >= 18)
+                    AND (@OnlyWithPhoto IS NULL OR @OnlyWithPhoto = false OR photos.ImageID IS NOT NULL)
                  ORDER BY 
                     users.UserID"
             );
@@ -215,6 +217,7 @@ namespace ASP_users.Repositories
             command.Parameters.AddWithValue("@CreatedFrom", createdFrom ?? (object)DBNull.Value);
             command.Parameters.AddWithValue("@CreatedTo", createdTo ?? (object)DBNull.Value);
             command.Parameters.AddWithValue("@OnlyAdults", onlyAdults ?? (object)DBNull.Value);
+            command.Parameters.AddWithValue("@OnlyWithPhoto", onlyWithPhoto ?? (object)DBNull.Value);
 
             _connection.Open();
 

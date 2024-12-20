@@ -12,7 +12,8 @@ namespace ASP_users.Interfaces
             int? maxAge,
             DateTime? createdFrom,
             DateTime? createdTo,
-            bool? onlyAdults);
+            bool? onlyAdults,
+            bool? onlyWithPhoto);
         Task CreateUser(User user);
         Task UpdateUser(Guid userId, User user);
         Task DeleteUser(Guid userId);

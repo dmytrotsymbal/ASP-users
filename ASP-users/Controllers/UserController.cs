@@ -63,11 +63,19 @@ namespace ASP_users.Controllers
             [FromQuery] int? maxAge,
             [FromQuery] DateTime? createdFrom,
             [FromQuery] DateTime? createdTo,
-            [FromQuery] bool? onlyAdults)
+            [FromQuery] bool? onlyAdults,
+            [FromQuery] bool? onlyWithPhoto)
         {
             try
             {
-                var searchedUsers = await _userRepository.SearchUsers(searchQuery, minAge, maxAge, createdFrom, createdTo, onlyAdults);
+                var searchedUsers = await _userRepository.SearchUsers(
+                    searchQuery,
+                    minAge,
+                    maxAge,
+                    createdFrom,
+                    createdTo,
+                    onlyAdults,
+                    onlyWithPhoto);
                 if (!searchedUsers.Any())
                 {
                     return NotFound("Користувачів за вишим запитом не знайдено");
