@@ -198,7 +198,8 @@ namespace ASP_users.Repositories
             string? searchQuery,
             int? minYear,
             int? maxYear,
-            string? carColor)
+            string? carColor,
+            bool? onlyWithPhoto)
         {
             var searchedCars = new List<Car>();
 
@@ -219,6 +220,7 @@ namespace ASP_users.Repositories
                     AND (@minYear IS NULL OR Year >= @minYear)
                     AND (@maxYear IS NULL OR Year <= @maxYear)
                     AND (@carColor IS NULL OR Color LIKE @carColor)
+                    AND (@OnlyWithPhoto = 0 OR (CarPhotoURL IS NOT NULL AND CarPhotoURL != ''))
                 ORDER BY 
                     CarID"
             );
@@ -227,6 +229,7 @@ namespace ASP_users.Repositories
             command.Parameters.AddWithValue("@MinYear", minYear ?? (object)DBNull.Value);
             command.Parameters.AddWithValue("@MaxYear", maxYear ?? (object)DBNull.Value);
             command.Parameters.AddWithValue("@CarColor", carColor ?? (object)DBNull.Value);
+            command.Parameters.AddWithValue("@OnlyWithPhoto", onlyWithPhoto ?? (object)DBNull.Value);
 
             _connection.Open();
 
@@ -249,7 +252,7 @@ namespace ASP_users.Repositories
                         Color = reader.GetString(4),
                         Year = reader.GetInt32(5),
                         LicensePlate = reader.GetString(6),
-                        CarPhotoURL = reader.IsDBNull(7) ? null : reader.GetString(7)
+                        CarPhotoURL = reader.GetString(7)
                     };
                     searchedCars.Add(car);
                 }

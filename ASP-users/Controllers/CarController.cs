@@ -79,11 +79,12 @@ namespace ASP_users.Controllers
             [FromQuery] string? searchQuery,
             [FromQuery] int? minYear,
             [FromQuery] int? maxYear,
-            [FromQuery] string? carColor)
+            [FromQuery] string? carColor,
+            [FromQuery] bool? onlyWithPhoto)
         {
             try
             {
-                var searchedCars = await _carRepository.SearchCars(searchQuery, minYear, maxYear, carColor);
+                var searchedCars = await _carRepository.SearchCars(searchQuery, minYear, maxYear, carColor, onlyWithPhoto);
                 if (!searchedCars.Any())
                 {
                     return NotFound("Машин за вашим запитом не знайдено");

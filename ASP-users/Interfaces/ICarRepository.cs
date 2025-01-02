@@ -14,7 +14,8 @@ namespace ASP_users.Interfaces
             string? searchQuery,
             int? minYear,
             int? maxYear,
-            string? carColor);
+            string? carColor,
+            bool? onlyWithPhoto);
 
         Task UpdateCar(int carId, Car car);
 
