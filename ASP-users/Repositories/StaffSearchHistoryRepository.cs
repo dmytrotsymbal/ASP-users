@@ -15,6 +15,7 @@ namespace ASP_users.Repositories
 
             var command = CreateCommand(
                 @"SELECT 
+                    SearchID,
                     StaffID, 
                     SearchQuery, 
                     SearchFilters, 
@@ -32,14 +33,14 @@ namespace ASP_users.Repositories
             {
                 staffHistory.Add(new StaffSearchHistory
                 {
-                    StaffID = reader.GetInt32(0),
-                    SearchQuery = reader.GetString(1),
-                    SearchFilters = reader.IsDBNull(2) ? "{}" : reader.GetString(2), // Фікс перевірки NULL
-                    SearchType = reader.GetString(3),
-                    SearchDate = reader.GetDateTime(4)
+                    SearchID = reader.GetInt32(0),
+                    StaffID = reader.GetInt32(1),
+                    SearchQuery = reader.GetString(2),
+                    SearchFilters = reader.IsDBNull(3) ? "{}" : reader.GetString(3), // Фікс перевірки NULL
+                    SearchType = reader.GetString(4),
+                    SearchDate = reader.GetDateTime(5)
                 });
             }
-
             _connection.Close();
             return staffHistory;
         }
