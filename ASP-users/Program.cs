@@ -28,6 +28,7 @@ builder.Services.AddScoped<ICarRepository, CarRepository>();
 builder.Services.AddScoped<IAddressRepository, UserAddressRepository>();
 builder.Services.AddScoped<ICriminalRecordRepository, CriminalRecordRepository>();
 builder.Services.AddScoped<IStaffRepository, StaffRepository>();
+builder.Services.AddScoped<IStaffSearchHistoryRepository, StaffSearchHistoryRepository>();
 
 
 // Добавляем аутентификацию с JWT
