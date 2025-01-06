@@ -9,21 +9,28 @@ namespace ASP_users.Repositories
         public StaffSearchHistoryRepository(MySqlConnection connection) : base(connection) { }
 
 
-        public async Task<IEnumerable<StaffSearchHistory>> GetStaffSearchHistory()
+        public async Task<IEnumerable<StaffSearchHistory>> GetDetailedSearchHistoryByStaffId(int staffId)
         {
-            var staffHistory = new List<StaffSearchHistory>();
+            var history = new List<StaffSearchHistory>();
 
             var command = CreateCommand(
                 @"SELECT 
-                    SearchID,
-                    StaffID, 
-                    SearchQuery, 
-                    SearchFilters, 
-                    SearchType, 
-                    SearchDate
+                    staffsearchhistory.SearchID,
+                    staffaccounts.Nickname,
+                    staffaccounts.Email,
+                    staffaccounts.Role, 
+                    staffsearchhistory.SearchQuery, 
+                    staffsearchhistory.SearchFilters, 
+                    staffsearchhistory.SearchType, 
+                    staffsearchhistory.SearchDate
                   FROM 
-                    StaffSearchHistory"
-            );
+                    staffsearchhistory 
+                  JOIN 
+                    staffaccounts ON staffaccounts.StaffID = staffsearchhistory.StaffID
+                  WHERE 
+                    staffaccounts.StaffID = @StaffID");
+
+            command.Parameters.AddWithValue("@StaffID", staffId);
 
             _connection.Open();
 
@@ -31,18 +38,21 @@ namespace ASP_users.Repositories
 
             while (await reader.ReadAsync())
             {
-                staffHistory.Add(new StaffSearchHistory
+                history.Add(new StaffSearchHistory
                 {
                     SearchID = reader.GetInt32(0),
-                    StaffID = reader.GetInt32(1),
-                    SearchQuery = reader.GetString(2),
-                    SearchFilters = reader.IsDBNull(3) ? "{}" : reader.GetString(3), // Фікс перевірки NULL
-                    SearchType = reader.GetString(4),
-                    SearchDate = reader.GetDateTime(5)
+                    Nickname = reader.GetString(1),
+                    Email = reader.GetString(2),
+                    Role = reader.GetString(3),
+                    SearchQuery = reader.GetString(4),
+                    SearchFilters = reader.IsDBNull(5) ? "{}" : reader.GetString(5),
+                    SearchType = reader.GetString(6),
+                    SearchDate = reader.GetDateTime(7)
                 });
             }
+
             _connection.Close();
-            return staffHistory;
+            return history;
         }
 
 
