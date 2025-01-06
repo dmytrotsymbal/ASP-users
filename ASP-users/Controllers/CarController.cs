@@ -10,10 +10,12 @@ namespace ASP_users.Controllers
     public class CarController : ControllerBase
     {
         private readonly ICarRepository _carRepository;
+        private readonly IStaffSearchHistoryRepository _staffSearchHistoryRepository;
 
-        public CarController(ICarRepository carRepository)
+        public CarController(ICarRepository carRepository, IStaffSearchHistoryRepository staffSearchHistoryRepository)
         {
             _carRepository = carRepository;
+            _staffSearchHistoryRepository = staffSearchHistoryRepository;
         }
 
 
@@ -76,26 +78,53 @@ namespace ASP_users.Controllers
         [HttpGet("search-cars")]
         [Authorize(Roles = "admin, moderator, visitor")]
         public async Task<IActionResult> SearchCars(
-            [FromQuery] string? searchQuery,
-            [FromQuery] int? minYear,
-            [FromQuery] int? maxYear,
-            [FromQuery] string? carColor,
-            [FromQuery] bool? onlyWithPhoto)
+        [FromQuery] string? searchQuery,
+        [FromQuery] int? minYear,
+        [FromQuery] int? maxYear,
+        [FromQuery] string? carColor,
+        [FromQuery] bool? onlyWithPhoto)
         {
             try
             {
+                if (string.IsNullOrEmpty(searchQuery) && !minYear.HasValue && !maxYear.HasValue && string.IsNullOrEmpty(carColor) && !onlyWithPhoto.HasValue)
+                {
+                    return BadRequest("Потрібно вказати хоча б один параметр для пошуку.");
+                }
+
                 var searchedCars = await _carRepository.SearchCars(searchQuery, minYear, maxYear, carColor, onlyWithPhoto);
+
                 if (!searchedCars.Any())
                 {
-                    return NotFound("Машин за вашим запитом не знайдено");
+                    return NotFound("Машин за вашим запитом не знайдено.");
                 }
+
+                var searchFilters = System.Text.Json.JsonSerializer.Serialize(new
+                {
+                    minYear = minYear ?? 0,
+                    maxYear = maxYear ?? 0,
+                    carColor = carColor ?? "",
+                    onlyWithPhoto = onlyWithPhoto ?? false
+                });
+
+                var staffId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "0");
+
+                await _staffSearchHistoryRepository.AddSearchHistory(
+                    staffId,
+                    searchQuery ?? "",
+                    searchFilters,
+                    "cars"
+                );
+
                 return Ok(searchedCars);
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"Error: {ex.Message}");
+                Console.WriteLine($"StackTrace: {ex.StackTrace}");
                 return BadRequest(ex.Message);
             }
         }
+
 
 
         [HttpPut("update/{CarId}")]
