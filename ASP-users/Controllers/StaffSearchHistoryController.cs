@@ -17,16 +17,15 @@ namespace ASP_users.Controllers
             _staffSearchHistoryRepository = staffSearchHistoryRepository;
         }
 
-        // Получаем подробную историю для текущего пользователя
-        [HttpGet("get-my-search-history")]
+
+        [HttpGet("get-my-search-history/{staffId}")]
+        [Authorize(Roles = "admin, moderator, visitor")]
         public async Task<IActionResult> GetMyDetailedHistory()
         {
             try
             {
-                // Получаем ID текущего пользователя
                 var staffId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
 
-                // Получаем историю из репозитория
                 var history = await _staffSearchHistoryRepository.GetDetailedSearchHistoryByStaffId(staffId);
 
                 if (history == null || !history.Any())
