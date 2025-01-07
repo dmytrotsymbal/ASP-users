@@ -11,10 +11,12 @@ namespace ASP_users.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserRepository _userRepository;
+        private readonly IStaffSearchHistoryRepository _staffSearchHistoryRepository;
 
-        public UserController(IUserRepository userRepository)
+        public UserController(IUserRepository userRepository, IStaffSearchHistoryRepository staffSearchHistoryRepository)
         {
             _userRepository = userRepository;
+            _staffSearchHistoryRepository = staffSearchHistoryRepository;
         }
 
 
@@ -68,6 +70,13 @@ namespace ASP_users.Controllers
         {
             try
             {
+                if (string.IsNullOrEmpty(searchQuery) && !minAge.HasValue && !maxAge.HasValue && !createdFrom.HasValue && !createdTo.HasValue && !onlyAdults.HasValue && !onlyWithPhoto.HasValue)
+                {
+                    return BadRequest("Не задано жодного пошукового запиту");
+                }
+
+                var staffId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "0");
+
                 var searchedUsers = await _userRepository.SearchUsers(
                     searchQuery,
                     minAge,
@@ -76,15 +85,39 @@ namespace ASP_users.Controllers
                     createdTo,
                     onlyAdults,
                     onlyWithPhoto);
+
                 if (!searchedUsers.Any())
                 {
                     return NotFound("Користувачів за вишим запитом не знайдено");
                 }
+
+                var searchFilters = System.Text.Json.JsonSerializer.Serialize(new
+                {
+                    minAge = minAge ?? 0,
+                    maxAge = maxAge ?? 120,
+                    createdFrom = createdFrom ?? DateTime.MinValue,
+                    createdTo = createdTo ?? DateTime.MaxValue,
+                    onlyAdults = onlyAdults ?? false,
+                    onlyWithPhoto = onlyWithPhoto ?? false
+                });
+
+
+                await _staffSearchHistoryRepository.AddSearchHistory(
+                     staffId,
+                     searchQuery ?? "",
+                     searchFilters,
+                     "users"
+                 );
+
+
                 return Ok(searchedUsers);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex.Message);
+                Console.WriteLine($"Error: {ex.Message}");
+                Console.WriteLine($"StackTrace: {ex.StackTrace}");
+                return BadRequest(ex.Message);
+
             }
         }
 
