@@ -28,7 +28,9 @@ namespace ASP_users.Repositories
                   JOIN 
                     staffaccounts ON staffaccounts.StaffID = staffsearchhistory.StaffID
                   WHERE 
-                    staffaccounts.StaffID = @StaffID");
+                    staffaccounts.StaffID = @StaffID
+                  ORDER BY 
+                    staffsearchhistory.SearchDate DESC");
 
             command.Parameters.AddWithValue("@StaffID", staffId);
 
