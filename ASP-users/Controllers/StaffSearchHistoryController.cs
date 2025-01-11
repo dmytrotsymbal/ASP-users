@@ -18,6 +18,26 @@ namespace ASP_users.Controllers
         }
 
 
+        [HttpGet("get-all-history-search")]
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> GetAllHistorySearch()
+        {
+            try
+            {
+                var allHistory = await _staffSearchHistoryRepository.GetAllSearchHistory();
+                if (allHistory == null)
+                {
+                    return NotFound("Історія пошуку відсутня.");
+                }
+                return Ok(allHistory);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+
         [HttpGet("get-my-search-history/{staffId}")]
         [Authorize(Roles = "admin, moderator, visitor")]
         public async Task<IActionResult> GetMyDetailedHistory()

@@ -9,6 +9,51 @@ namespace ASP_users.Repositories
         public StaffSearchHistoryRepository(MySqlConnection connection) : base(connection) { }
 
 
+        public async Task<IEnumerable<StaffSearchHistory>> GetAllSearchHistory()
+        {
+            var allHistory = new List<StaffSearchHistory>();
+
+            var command = CreateCommand(
+                @"SELECT 
+                    staffsearchhistory.SearchID,
+                    staffaccounts.Nickname,
+                    staffaccounts.Email,
+                    staffaccounts.Role, 
+                    staffsearchhistory.SearchQuery, 
+                    staffsearchhistory.SearchFilters, 
+                    staffsearchhistory.SearchType, 
+                    staffsearchhistory.SearchDate
+                  FROM 
+                    staffsearchhistory 
+                  JOIN 
+                    staffaccounts ON staffaccounts.StaffID = staffsearchhistory.StaffID
+                  ORDER BY 
+                    staffsearchhistory.SearchDate DESC");
+
+            _connection.Open();
+
+            var reader = await command.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
+            {
+                allHistory.Add(new StaffSearchHistory
+                {
+                    SearchID = reader.GetInt32(0),
+                    Nickname = reader.GetString(1),
+                    Email = reader.GetString(2),
+                    Role = reader.GetString(3),
+                    SearchQuery = reader.GetString(4),
+                    SearchFilters = reader.IsDBNull(5) ? "{}" : reader.GetString(5),
+                    SearchType = reader.GetString(6),
+                    SearchDate = reader.GetDateTime(7)
+                });
+            }
+
+            _connection.Close();
+            return allHistory;
+        }
+
+
         public async Task<IEnumerable<StaffSearchHistory>> GetDetailedSearchHistoryByStaffId(int staffId)
         {
             var history = new List<StaffSearchHistory>();
