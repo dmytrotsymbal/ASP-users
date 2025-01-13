@@ -20,11 +20,11 @@ namespace ASP_users.Controllers
 
         [HttpGet("get-all-history-search")]
         [Authorize(Roles = "admin")]
-        public async Task<IActionResult> GetAllHistorySearch()
+        public async Task<IActionResult> GetAllHistorySearch(int pageNumber = 1, int pageSize = 20)
         {
             try
             {
-                var allHistory = await _staffSearchHistoryRepository.GetAllSearchHistory();
+                var allHistory = await _staffSearchHistoryRepository.GetAllSearchHistory(pageNumber, pageSize);
                 if (allHistory == null)
                 {
                     return NotFound("Історія пошуку відсутня.");
@@ -58,6 +58,27 @@ namespace ASP_users.Controllers
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
+            }
+        }
+
+
+
+
+        // HALPERS
+
+        [HttpGet("quantity")]
+        [Authorize(Roles = "admin, moderator, visitor")]
+        public async Task<IActionResult> AllSearchHistoryQantity()
+        {
+            try
+            {
+                var quantity = await _staffSearchHistoryRepository.AllSearchHistoryQantity();
+                return Ok(quantity);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching quantity: {ex.Message}");
+                return BadRequest("Помилка отримання кількості записів.");
             }
         }
     }

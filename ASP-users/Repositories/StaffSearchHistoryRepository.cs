@@ -9,8 +9,10 @@ namespace ASP_users.Repositories
         public StaffSearchHistoryRepository(MySqlConnection connection) : base(connection) { }
 
 
-        public async Task<IEnumerable<StaffSearchHistory>> GetAllSearchHistory()
+        public async Task<IEnumerable<StaffSearchHistory>> GetAllSearchHistory(int pageNumber = 1, int pageSize = 20)
         {
+            var offset = (pageNumber - 1) * pageSize;
+
             var allHistory = new List<StaffSearchHistory>();
 
             var command = CreateCommand(
@@ -28,7 +30,12 @@ namespace ASP_users.Repositories
                   JOIN 
                     staffaccounts ON staffaccounts.StaffID = staffsearchhistory.StaffID
                   ORDER BY 
-                    staffsearchhistory.SearchDate DESC");
+                    staffsearchhistory.SearchDate DESC
+                  LIMIT @offset, @pageSize"
+             );
+
+            command.Parameters.AddWithValue("@offset", offset);
+            command.Parameters.AddWithValue("@pageSize", pageSize);
 
             _connection.Open();
 
@@ -129,6 +136,25 @@ namespace ASP_users.Repositories
             await command.ExecuteNonQueryAsync();
 
             _connection.Close();
+        }
+
+
+
+
+        // HALPERS
+
+
+        public async Task<int> AllSearchHistoryQantity()
+        {
+            var command = CreateCommand(@"SELECT COUNT(*) FROM StaffSearchHistory");
+
+            _connection.Open();
+
+            var quantity = Convert.ToInt32(await command.ExecuteScalarAsync());
+
+            _connection.Close();
+
+            return quantity;
         }
     }
 }
