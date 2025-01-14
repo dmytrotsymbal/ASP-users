@@ -9,7 +9,7 @@ namespace ASP_users.Repositories
         public StaffSearchHistoryRepository(MySqlConnection connection) : base(connection) { }
 
 
-        public async Task<IEnumerable<StaffSearchHistory>> GetAllSearchHistory(int pageNumber = 1, int pageSize = 20)
+        public async Task<IEnumerable<StaffSearchHistory>> GetAllSearchHistory(int pageNumber = 1, int pageSize = 15)
         {
             var offset = (pageNumber - 1) * pageSize;
 
@@ -61,8 +61,10 @@ namespace ASP_users.Repositories
         }
 
 
-        public async Task<IEnumerable<StaffSearchHistory>> GetDetailedSearchHistoryByStaffId(int staffId)
+        public async Task<IEnumerable<StaffSearchHistory>> CurrentStaffSearchHistory(int staffId, int pageNumber = 1, int pageSize = 15)
         {
+            var offset = (pageNumber - 1) * pageSize;
+
             var history = new List<StaffSearchHistory>();
 
             var command = CreateCommand(
@@ -82,9 +84,12 @@ namespace ASP_users.Repositories
                   WHERE 
                     staffaccounts.StaffID = @StaffID
                   ORDER BY 
-                    staffsearchhistory.SearchDate DESC");
+                    staffsearchhistory.SearchDate DESC
+                  LIMIT @offset, @pageSize");
 
             command.Parameters.AddWithValue("@StaffID", staffId);
+            command.Parameters.AddWithValue("@offset", offset);
+            command.Parameters.AddWithValue("@pageSize", pageSize);
 
             _connection.Open();
 
@@ -142,13 +147,27 @@ namespace ASP_users.Repositories
 
 
         // HALPERS
-
-
         public async Task<int> AllSearchHistoryQantity()
         {
             var command = CreateCommand(@"SELECT COUNT(*) FROM StaffSearchHistory");
 
             _connection.Open();
+
+            var quantity = Convert.ToInt32(await command.ExecuteScalarAsync());
+
+            _connection.Close();
+
+            return quantity;
+        }
+
+
+        public async Task<int> CurrentStaffSearchHistoryQantity(int staffId)
+        {
+            var command = CreateCommand(@"SELECT COUNT(*) FROM StaffSearchHistory WHERE StaffID = @StaffID");
+
+            _connection.Open();
+
+            command.Parameters.AddWithValue("@StaffID", staffId);
 
             var quantity = Convert.ToInt32(await command.ExecuteScalarAsync());
 

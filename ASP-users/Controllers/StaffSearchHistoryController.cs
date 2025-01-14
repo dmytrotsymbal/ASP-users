@@ -18,9 +18,9 @@ namespace ASP_users.Controllers
         }
 
 
-        [HttpGet("get-all-history-search")]
+        [HttpGet("get-all-search-history")]
         [Authorize(Roles = "admin")]
-        public async Task<IActionResult> GetAllHistorySearch(int pageNumber = 1, int pageSize = 20)
+        public async Task<IActionResult> GetAllSearchHistory(int pageNumber = 1, int pageSize = 15)
         {
             try
             {
@@ -38,15 +38,15 @@ namespace ASP_users.Controllers
         }
 
 
-        [HttpGet("get-my-search-history/{staffId}")]
+        [HttpGet("get-current-staff-search-history/{staffId}")]
         [Authorize(Roles = "admin, moderator, visitor")]
-        public async Task<IActionResult> GetMyDetailedHistory()
+        public async Task<IActionResult> CurrentStaffSearchHistory(int pageNumber = 1, int pageSize = 15)
         {
             try
             {
                 var staffId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
 
-                var history = await _staffSearchHistoryRepository.GetDetailedSearchHistoryByStaffId(staffId);
+                var history = await _staffSearchHistoryRepository.CurrentStaffSearchHistory(staffId, pageNumber, pageSize);
 
                 if (history == null || !history.Any())
                 {
@@ -66,13 +66,31 @@ namespace ASP_users.Controllers
 
         // HALPERS
 
-        [HttpGet("quantity")]
+        [HttpGet("all-search-history-quantity")]
         [Authorize(Roles = "admin, moderator, visitor")]
         public async Task<IActionResult> AllSearchHistoryQantity()
         {
             try
             {
                 var quantity = await _staffSearchHistoryRepository.AllSearchHistoryQantity();
+                return Ok(quantity);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching quantity: {ex.Message}");
+                return BadRequest("Помилка отримання кількості записів.");
+            }
+        }
+
+
+        [HttpGet("current-staff-search-history-quantity/{staffId}")]
+        [Authorize(Roles = "admin, moderator, visitor")]
+        public async Task<IActionResult> CurrentStaffSearchHistoryQantity()
+        {
+            try
+            {
+                var staffId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+                var quantity = await _staffSearchHistoryRepository.CurrentStaffSearchHistoryQantity(staffId);
                 return Ok(quantity);
             }
             catch (Exception ex)
