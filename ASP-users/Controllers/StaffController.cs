@@ -58,6 +58,22 @@ namespace ASP_users.Controllers
 
 
 
+        [HttpGet("get-top-searchers")]
+        public async Task<IActionResult> GetTopSearchers()
+        {
+            try
+            {
+                var topSearchers = await _staffRepository.GetTopSearchers();
+                return Ok(topSearchers);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+
+
         // HALPERS =========================================================================
         private string GenerateJwtToken(StaffAccount staffAccount)
         {

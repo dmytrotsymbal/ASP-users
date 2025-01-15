@@ -50,5 +50,44 @@ namespace ASP_users.Repositories
 
             return staffAccount;
         }
+
+
+
+        public async Task<IEnumerable<StaffSearchSummary>> GetTopSearchers()
+        {
+            var topSearchers = new List<StaffSearchSummary>();
+
+            var command = CreateCommand(
+                @"SELECT 
+                    staffaccounts.StaffID,
+                    staffaccounts.Nickname,
+                    staffaccounts.Role,
+                    COUNT(staffsearchhistory.SearchID) AS SearchCount
+                 FROM 
+                    staffaccounts LEFT JOIN staffsearchhistory ON staffaccounts.StaffID = staffsearchhistory.StaffID
+                 GROUP BY 
+                    staffaccounts.StaffID, staffaccounts.Nickname, staffaccounts.Email, staffaccounts.Role
+                 ORDER BY 
+                    SearchCount DESC");
+
+            _connection.Open();
+
+            var reader = await command.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
+            {
+                topSearchers.Add(new StaffSearchSummary
+                {
+                    StaffID = reader.GetInt32(0),
+                    Nickname = reader.GetString(1),
+                    Role = (RoleEnum)Enum.Parse(typeof(RoleEnum), reader.GetString(2)),
+                    SearchCount = reader.GetInt32(3)
+                });
+            }
+            _connection.Close();
+
+            return topSearchers;
+        }
+
     }
 }
